@@ -55,16 +55,12 @@
 	add sp, sp, #(11 * 16);
 
 
-
-
-
 	.text
 
 
 
 
-
-// subroutine
+// void subroutine
 //
 // input arguments:
 // w8   <- k
@@ -825,7 +821,12 @@ inner_edge_potrf_4x4_lib4:
 
 
 
-// subroutine
+// end
+
+
+
+
+// void subroutine
 //
 // input arguments:
 // x8   <- alpha
@@ -879,7 +880,12 @@ inner_scale_ab_4x4_lib4:
 
 
 
-// subroutine
+// end
+
+
+
+
+// void subroutine
 //
 // input arguments:
 // x8  <- C

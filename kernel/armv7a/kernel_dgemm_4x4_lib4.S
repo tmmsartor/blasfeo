@@ -1,30 +1,30 @@
-/**************************************************************************************************
-*                                                                                                 *
-* This file is part of BLASFEO.                                                                   *
-*                                                                                                 *
-* BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
-* Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
-* All rights reserved.                                                                            *
-*                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
-*                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
-* but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
-*                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
-*                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
-*                                                                                                 *
-**************************************************************************************************/
+/****************************************************************************************
+*                                                                                       *
+* This file is part of BLASFEO.                                                         *
+*                                                                                       *
+* BLASFEO -- BLAS For Embedded Optimization.                                            *
+* Copyright (C) 2016-2017 by Gianluca Frison.                                           *
+* Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.    *
+* All rights reserved.                                                                  *
+*                                                                                       *
+* HPMPC is free software; you can redistribute it and/or                                *
+* modify it under the terms of the GNU Lesser General Public                            *
+* License as published by the Free Software Foundation; either                          *
+* version 2.1 of the License, or (at your option) any later version.                    *
+*                                                                                       *
+* HPMPC is distributed in the hope that it will be useful,                              *
+* but WITHOUT ANY WARRANTY; without even the implied warranty of                        *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                  *
+* See the GNU Lesser General Public License for more details.                           *
+*                                                                                       *
+* You should have received a copy of the GNU Lesser General Public                      *
+* License along with HPMPC; if not, write to the Free Software                          *
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        *
+*                                                                                       *
+* Author: Gianluca Frison, giaf (at) dtu.dk                                             *
+*                          gianluca.frison (at) imtek.uni-freiburg.de                   *
+*                                                                                       *
+****************************************************************************************/
 
 #if defined(OS_LINUX)
 	.text
@@ -34,6 +34,7 @@
 
 
 
+// void INNER_KERNEL_DGEMM_ADD_NT_4X4_LIB4
 // subroutine
 //
 // input arguments:
@@ -393,9 +394,12 @@ _inner_kernel_dgemm_add_nt_4x4_lib4:
 #endif
 #endif
 
+// end
 
 
 
+
+// void INNER_KERNEL_DGEMM_ADD_NN_4X4_LIB4
 
 // subroutine
 //
@@ -758,10 +762,12 @@ _inner_kernel_dgemm_add_nn_4x4_lib4:
 #endif
 #endif
 
+// end
 
 
 
 
+// void INNER_KERNEL_DSYRK_L_ADD_NT_4X4_LIB4
 // subroutine
 //
 // input arguments:
@@ -1070,10 +1076,12 @@ _inner_kernel_dsyrk_l_add_nt_4x4_lib4:
 #endif
 #endif
 
+// end
 
 
 
 
+// void INNER_KERNEL_DGEMM_SUB_NT_4X4_LIB4
 // subroutine
 //
 // input arguments:
@@ -1436,10 +1444,13 @@ _inner_kernel_dgemm_sub_nt_4x4_lib4:
 #endif
 #endif
 
+// end
 
 
 
 
+
+// void INNER_KERNEL_DSYRK_L_SUB_NT_4X4_LIB4
 // subroutine
 //
 // input arguments:
@@ -1748,9 +1759,12 @@ _inner_kernel_dsyrk_l_sub_nt_4x4_lib4:
 #endif
 #endif
 
+// end
 
 
 
+
+// void INNER_EDGE_DGEMM_ADD_NN_4X4_LIB4
 
 // subroutine
 //
@@ -1844,11 +1858,13 @@ _inner_edge_dgemm_add_nn_4x4_lib4:
 	.size	inner_edge_dgemm_add_nn_4x4_lib4, .-inner_edge_dgemm_add_nn_4x4_lib4
 #endif
 #endif
-	
+
+// end
 
 
 
 
+// void  INNER_EDGE_DTRSM_RLT_INV_4X4_LIB4
 // subroutine
 //
 // triangular substitution:
@@ -1945,13 +1961,15 @@ inner_edge_dtrsm_rlt_inv_4x4_lib4:
 #endif
 #endif
 
+// end
 
 
 
 
+// void INNER_EDGE_DPOTRF_4X4_LIB4
 // subroutine
 //
-// cholesky factorization 
+// cholesky factorization
 //
 // input arguments:
 // r4   <- inv_diag_D
@@ -2043,7 +2061,7 @@ _inner_edge_dpotrf_4x4_lib4:
 	fldd		d15, .LC01
 
 0:
-	
+
 #if MACRO_LEVEL>=1
 	.endm
 #else
@@ -2054,6 +2072,9 @@ _inner_edge_dpotrf_4x4_lib4:
 #endif
 #endif
 
+// end
+
+
 	.align 3
 .LC01: // { 0 }
 	.word 0
@@ -2063,6 +2084,7 @@ _inner_edge_dpotrf_4x4_lib4:
 
 
 
+// void INNER_SCALE_AB_4X4_LIB4
 // subroutine
 //
 // input arguments:
@@ -2160,10 +2182,12 @@ _inner_scale_ab_4x4_lib4:
 #endif
 #endif
 
+// end
 
 
 
 
+// void INNER_SCALE_11_4X4_LIB4
 // subroutine
 //
 // input arguments:
@@ -2229,11 +2253,12 @@ _inner_scale_11_4x4_lib4:
 	.size	inner_scale_11_4x4_lib4, .-inner_scale_11_4x4_lib4
 #endif
 #endif
+// end
 
 
 
 
-
+// void INNER_STORE_4X4_LIB4
 // subroutine
 //
 // input arguments:
@@ -2274,6 +2299,7 @@ _inner_store_4x4_lib4:
 	fstd	d15, [r4, #120]
 
 #if MACRO_LEVEL>=2
+	INNER_STORE_4X4_LIB4
 	.endm
 #else
 	mov		pc, lr // return
@@ -2282,10 +2308,12 @@ _inner_store_4x4_lib4:
 	.size	inner_store_4x4_lib4, .-inner_store_4x4_lib4
 #endif
 #endif
+// end
 
 
 
 
+// void INNER_STORE_L_4X4_LIB4
 
 // subroutine
 //
@@ -2335,6 +2363,7 @@ _inner_store_l_4x4_lib4:
 	.size	inner_store_l_4x4_lib4, .-inner_store_l_4x4_lib4
 #endif
 #endif
+// end
 
 
 
@@ -2346,8 +2375,8 @@ _inner_store_l_4x4_lib4:
 	.word 0
 	.word 0
 
-//                               r0        r1             r2         r3         sp+0          sp+4       sp+8
 // void kernel_dgemm_nt_4x4_lib4(int kmax, double *alpha, double *A, double *B, double *beta, double *C, double *D)
+//                               r0        r1             r2         r3         sp+0          sp+4       sp+8
 
 //	.p2align 4,,15
 #if defined(OS_LINUX)
@@ -2453,12 +2482,13 @@ _kernel_dgemm_nt_4x4_lib4:
 	.size	kernel_dgemm_nt_4x4_lib4, .-kernel_dgemm_nt_4x4_lib4
 #endif
 
+// end
 
 
 
 
-//                               r0        r1             r2         r3           sp+0       sp+4     sp+8          sp+12      sp+16
 // void kernel_dgemm_nn_4x4_lib4(int kmax, double *alpha, double *A, int offsetB, double *B, int sdb, double *beta, double *C, double *D)
+//                               r0        r1             r2         r3           sp+0       sp+4     sp+8          sp+12      sp+16
 
 //	.p2align 4,,15
 #if defined(OS_LINUX)
@@ -2576,13 +2606,13 @@ _kernel_dgemm_nn_4x4_lib4:
 #if defined(OS_LINUX)
 	.size	kernel_dgemm_nn_4x4_lib4, .-kernel_dgemm_nn_4x4_lib4
 #endif
+// end
 
 
 
 
-
-//                                 r0        r1             r2         r3         sp+0          sp+4       sp+8
 // void kernel_dsyrk_nt_l_4x4_lib4(int kmax, double *alpha, double *A, double *B, double *beta, double *C, double *D);
+//                                 r0        r1             r2         r3         sp+0          sp+4       sp+8
 
 //	.p2align 4,,15
 #if defined(OS_LINUX)
@@ -2687,13 +2717,13 @@ _kernel_dsyrk_nt_l_4x4_lib4:
 #if defined(OS_LINUX)
 	.size	kernel_dsyrk_nt_l_4x4_lib4, .-kernel_dsyrk_nt_l_4x4_lib4
 #endif
+// end
 
 
 
 
-
-//                                      r0        r1         r2         r3         sp+0       sp+4       rsp+8
 // void kernel_dtrsm_nt_rl_inv_4x4_lib4(int kmax, double *A, double *B, double *C, double *D, double *E, double *inv_diag_E);
+//                                      r0        r1         r2         r3         sp+0       sp+4       rsp+8
 
 //	.p2align 4,,15
 #if defined(OS_LINUX)
@@ -2812,12 +2842,13 @@ _kernel_dtrsm_nt_rl_inv_4x4_lib4:
 #if defined(OS_LINUX)
 	.size	kernel_dtrsm_nt_rl_inv_4x4_lib4, .-kernel_dtrsm_nt_rl_inv_4x4_lib4
 #endif
+// end
 
 
 
 
-//                                  r0        r1         r2         r3         sp+0       sp+4
 // void kernel_dpotrf_nt_l_4x4_lib4(int kmax, double *A, double *B, double *C, double *D, double *inv_diag_D);
+//                                  r0        r1         r2         r3         sp+0       sp+4
 
 //	.p2align 4,,15
 #if defined(OS_LINUX)
@@ -2935,12 +2966,13 @@ _kernel_dpotrf_nt_l_4x4_lib4:
 #if defined(OS_LINUX)
 	.size	kernel_dpotrf_nt_l_4x4_lib4, .-kernel_dpotrf_nt_l_4x4_lib4
 #endif
+// end
 
 
 
 
-//                                            r0      r1          r2          r3      sp+0        sp+4        sp+8       sp+12      sp+16      sp+20
 // void kernel_dgemm_dtrsm_nt_rl_inv_4x4_lib4(int kp, double *Ap, double *Bp, int km, double *Am, double *Bm, double *C, double *D, double *E, double *inv_diag_E);
+//                                            r0      r1          r2          r3      sp+0        sp+4        sp+8       sp+12      sp+16      sp+20
 
 //	.p2align 4,,15
 #if defined(OS_LINUX)
@@ -3077,11 +3109,13 @@ _kernel_dgemm_dtrsm_nt_rl_inv_4x4_lib4:
 	.size	kernel_dgemm_dtrsm_nt_rl_inv_4x4_lib4, .-kernel_dgemm_dtrsm_nt_rl_inv_4x4_lib4
 #endif
 
+// end
 
 
 
-//                                        r0      r1          r2          r3      sp+0        sp+4        sp+8       sp+12      sp+16
+
 // void kernel_dsyrk_dpotrf_nt_l_4x4_lib4(int kp, double *Ap, double *Bp, int km, double *Am, double *Bm, double *C, double *D, double *inv_diag_D);
+//                                        r0      r1          r2          r3      sp+0        sp+4        sp+8       sp+12      sp+16
 
 //	.p2align 4,,15
 #if defined(OS_LINUX)
@@ -3216,8 +3250,4 @@ _kernel_dsyrk_dpotrf_nt_l_4x4_lib4:
 #if defined(OS_LINUX)
 	.size	kernel_dsyrk_dpotrf_nt_l_4x4_lib4, .-kernel_dsyrk_dpotrf_nt_l_4x4_lib4
 #endif
-
-
-
-
-
+// end
