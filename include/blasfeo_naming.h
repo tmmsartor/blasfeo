@@ -30,35 +30,53 @@
 /*
  * ----------- Naming conventions
  *
- *  (precision)(data)
+ *  blasfeo_(precision)(data-type)(operation)[_(options)]
  *
- * 1) d(double)
+ * 1)
+ *    d(double)
  *    s(single)
  *
- * 2) ge(general)
- *    tr(triangular)
- *    vec(vector)
- *    row(row)
- *    col(column)
- *    dia(diagonal)
+ * 2)
+ *    ge  (general)
+ *    tr  (triangular)
+ *    vec (vector)
+ *    row (row)
+ *    col (column)
+ *    dia (diagonal)
+ *    sy  (symmetric)
+ *    syrk (symmetric rank-k)
  *
- * 3) se(set)
- *    cp(copy)
- *    sc(scale)
- *    ad(add)
- *    tr(transpose)
- *    in(insert)
- *    ex(extract)
- *    pe(premute)
- *    sw(swap)
+ * 3)
+ *    * blas
+ *    mm (matrix-matrix multiplication)
+ *    mv (matrix-vector multiplication)
+ *    sm (solve matrix)
+ *    sm (solve vector)
  *
- *    f(factorization)
+ *    * aux
+ *    se (set)
+ *    cp (copy)
+ *    sc (scale)
+ *    ad (add)
+ *    tr (transpose)
+ *    in (insert)
+ *    ex (extract)
+ *    pe (premute)
+ *    sw (swap)
  *
- *    lqf(LQ factorization)
- *    qrf (factorization)
- *    trf (LU factorization using partial pivoting with row interchanges.)
+ *    * lapack
+ *    lqf (LQ factorization)
+ *    qrf (QR factorization)
+ *    trf (LU factorization using partial pivoting with row interchanges)
  *
- * 4) _l(lower) / _u(upper)
- *
- * 5) _sp(sparse)
+ * 4) options
+ *    l         (lower)
+ *    u         (upper)
+ *    d         (diagonal)
+ *    n         (non-trasposed)
+ *    t         (trasposed)
+ *    sp        (sparse)
+ *    nopivot
+ *    rowpivot
+ *    worksize  (return worksize in bytes)
  */
