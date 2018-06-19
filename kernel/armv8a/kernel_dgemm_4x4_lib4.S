@@ -64,7 +64,7 @@
 
 
 
-// subroutine
+// subroutine INNER_KERNEL_GEMM_ADD_NT_4X4_LIB4
 //
 // input arguments:
 // w8   <- k
@@ -104,7 +104,7 @@ inner_kernel_gemm_add_nt_4x4_lib4:
 
 	// main loop
 1:
-	
+
 	// unroll 0
 	ldp		q26, q27, [x9], #32
 	fmla	v0.2d, v24.2d, v28.2d[0]
@@ -246,7 +246,7 @@ inner_kernel_gemm_add_nt_4x4_lib4:
 
 2: // return
 
-	
+
 #if MACRO_LEVEL>=2
 	.endm
 #else
@@ -255,11 +255,12 @@ inner_kernel_gemm_add_nt_4x4_lib4:
 	.size	inner_kernel_gemm_add_nt_4x4_lib4, .-inner_kernel_gemm_add_nt_4x4_lib4
 #endif
 
+// end
 
 
 
 
-// subroutine
+// subroutine INNER_KERNEL_GEMM_SUB_NT_4X4_LIB4
 //
 // input arguments:
 // w8   <- k
@@ -299,7 +300,7 @@ inner_kernel_gemm_sub_nt_4x4_lib4:
 
 	// main loop
 1:
-	
+
 	// unroll 0
 	ldp		q26, q27, [x9], #32
 	fmls	v0.2d, v24.2d, v28.2d[0]
@@ -441,7 +442,7 @@ inner_kernel_gemm_sub_nt_4x4_lib4:
 
 2: // return
 
-	
+
 #if MACRO_LEVEL>=2
 	.endm
 #else
@@ -449,12 +450,13 @@ inner_kernel_gemm_sub_nt_4x4_lib4:
 
 	.size	inner_kernel_gemm_sub_nt_4x4_lib4, .-inner_kernel_gemm_sub_nt_4x4_lib4
 #endif
+// end
 
 
 
 
 
-// subroutine
+// subroutine INNER_KERNEL_SYRK_L_SUB_NT_4X4_LIB4
 //
 // input arguments:
 // w8   <- k
@@ -494,7 +496,7 @@ inner_kernel_syrk_l_sub_nt_4x4_lib4:
 
 	// main loop
 1:
-	
+
 	// unroll 0
 	ldp		q26, q27, [x9], #32
 	fmls	v0.2d, v24.2d, v28.2d[0]
@@ -636,7 +638,7 @@ inner_kernel_syrk_l_sub_nt_4x4_lib4:
 
 2: // return
 
-	
+
 #if MACRO_LEVEL>=2
 	.endm
 #else
@@ -644,12 +646,13 @@ inner_kernel_syrk_l_sub_nt_4x4_lib4:
 
 	.size	inner_kernel_syrk_l_sub_nt_4x4_lib4, .-inner_kernel_syrk_l_sub_nt_4x4_lib4
 #endif
+// end
 
 
 
 
 
-// subroutine
+// subroutine INNER_EDGE_TRSM_RLT_INV_4X4_LIB4
 //
 // triangular substitution:
 // side = right
@@ -672,7 +675,7 @@ inner_kernel_syrk_l_sub_nt_4x4_lib4:
 	.type inner_edge_trsm_rlt_inv_4x4_lib4, %function
 inner_edge_trsm_rlt_inv_4x4_lib4:
 #endif
-	
+
 	// first column
 	ldr			d16, [x9, #0] // E_inv[0]
 	fmul		v0.2d, v0.2d, v16.2d[0]
@@ -720,14 +723,15 @@ inner_edge_trsm_rlt_inv_4x4_lib4:
 	.size	inner_edge_trsm_rlt_inv_4x4_lib4, .-inner_edge_trsm_rlt_inv_4x4_lib4
 #endif
 #endif
+// end
 
 
 
 
 
-// subroutine
+// subroutine INNER_EDGE_POTRF_4X4_LIB4
 //
-// cholesky factorization 
+// cholesky factorization
 //
 // input arguments:
 // x8   <- inv_diag_D
@@ -742,7 +746,7 @@ inner_edge_trsm_rlt_inv_4x4_lib4:
 	.type inner_edge_potrf_4x4_lib4, %function
 inner_edge_potrf_4x4_lib4:
 #endif
-	
+
 	fmov		d16, 1.0e+0 // 1.0
 
 	// first column
@@ -812,7 +816,7 @@ inner_edge_potrf_4x4_lib4:
 	fmov		d18, xzr
 
 0:
-	
+
 #if MACRO_LEVEL>=1
 	.endm
 #else
@@ -820,12 +824,13 @@ inner_edge_potrf_4x4_lib4:
 
 	.size	inner_edge_potrf_4x4_lib4, .-inner_edge_potrf_4x4_lib4
 #endif
+// end
 
 
 
 
 
-// subroutine
+// subroutine INNER_SCALE_AB_4X4_LIB4
 //
 // input arguments:
 // x8   <- alpha
@@ -874,12 +879,13 @@ inner_scale_ab_4x4_lib4:
 
 	.size	inner_scale_ab_4x4_lib4, .-inner_scale_ab_4x4_lib4
 #endif
+// end
 
 
 
 
 
-// subroutine
+// subroutine INNER_SCALE_11_4X4_LIB4
 //
 // input arguments:
 // x8  <- C
@@ -913,12 +919,13 @@ inner_scale_11_4x4_lib4:
 
 	.size	inner_scale_11_4x4_lib4, .-inner_scale_11_4x4_lib4
 #endif
+// end
 
 
 
 
 
-// subroutine
+// subroutine INNER_STORE_4X4_LIB4
 //
 // input arguments:
 // x8   <- D
@@ -933,10 +940,10 @@ inner_scale_11_4x4_lib4:
 inner_store_4x4_lib4:
 #endif
 
-	stp		q0, q1, [x8, #0]
-	stp		q2, q3, [x8, #32]
-	stp		q4, q5, [x8, #64]
-	stp		q6, q7, [x8, #96]
+	stp		v0, v1, [x8, #0]
+	stp		v2, v3, [x8, #32]
+	stp		v4, v5, [x8, #64]
+	stp		v6, v7, [x8, #96]
 
 #if MACRO_LEVEL>=2
 	.endm
@@ -945,17 +952,18 @@ inner_store_4x4_lib4:
 
 	.size	inner_store_4x4_lib4, .-inner_store_4x4_lib4
 #endif
+// end
 
 
 
 
 
-// subroutine
+// subroutine INNER_STORE_4X4_VS_LIB4
 //
 // input arguments:
-// x8   <- D
+// x8  <- D
 // x9  <- km
-// x10  <- kn
+// x10 <- kn
 //
 // output arguments:
 
@@ -967,55 +975,68 @@ inner_store_4x4_lib4:
 inner_store_4x4_vs_lib4:
 #endif
 
+	// km>4
 	cmp		w9, #4
 	bge		1f
 
-	ldp		q24, q25, [x8, #(0*8+0*32)]
-	ldp		q26, q27, [x8, #(0*8+1*32)]
-	ldp		q28, q29, [x8, #(0*8+2*32)]
-	ldp		q30, q31, [x8, #(0*8+3*32)]
+	// laod D from memory
+	ldp		v24, v25, [x8, #(0*8+0*32)]
+	ldp		v26, v27, [x8, #(0*8+1*32)]
+	ldp		v28, v29, [x8, #(0*8+2*32)]
+	ldp		v30, v31, [x8, #(0*8+3*32)]
 
 	// 4th row
 	ins		v1.d[1], v25.d[1]
 	ins		v3.d[1], v27.d[1]
 	ins		v5.d[1], v29.d[1]
 	ins		v7.d[1], v31.d[1]
+	// km>3
 	cmp		w9, #3
 	bge		1f
+
 	// 3th row
 	ins		v1.d[0], v25.d[0]
 	ins		v3.d[0], v27.d[0]
 	ins		v5.d[0], v29.d[0]
 	ins		v7.d[0], v31.d[0]
+	// km>2
 	cmp		w9, #2
 	bge		1f
+
 	// 2nd row
 	ins		v0.d[1], v24.d[1]
 	ins		v2.d[1], v26.d[1]
 	ins		v4.d[1], v28.d[1]
 	ins		v6.d[1], v30.d[1]
+	// km>1
 	cmp		w9, #1
 	bge		1f
+
 	// 1st row
 	ins		v0.d[0], v24.d[0]
 	ins		v2.d[0], v26.d[0]
 	ins		v4.d[0], v28.d[0]
 	ins		v6.d[0], v30.d[0]
 
+// store all rows
 1:
-	// 1st col
-	stp		q0, q1, [x8, #(0*8+0*32)]
+	// store 1st col
+	stp		v0, v1, [x8, #(0*8+0*32)]
+	// if kn<2 return 1 col
 	cmp		w10, #2
 	blt		0f
-	// 2nd col
-	stp		q2, q3, [x8, #(0*8+1*32)]
+	// store 2nd col
+	stp		v2, v3, [x8, #(0*8+1*32)]
+	// if kn<3 return  2 col
 	cmp		w10, #3
 	blt		0f
-	// 3rd col
-	stp		q4, q5, [x8, #(0*8+2*32)]
+	// store 3rd col
+	stp		v4, v5, [x8, #(0*8+2*32)]
+	// if kn=3 return  3 col
 	beq		0f
-	// 4th col
-	stp		q6, q7, [x8, #(0*8+3*32)]
+	// store 4th col
+	stp		v6, v7, [x8, #(0*8+3*32)]
+	// return 4 col
 
 0:
 
@@ -1026,12 +1047,13 @@ inner_store_4x4_vs_lib4:
 
 	.size	inner_store_4x4_vs_lib4, .-inner_store_4x4_vs_lib4
 #endif
+// end
 
 
 
 
 
-// subroutine
+// subroutine INNER_STORE_L_4X4_LIB4
 //
 // input arguments:
 // x8   <- D
@@ -1064,19 +1086,70 @@ inner_store_l_4x4_lib4:
 
 	.size	inner_store_l_4x4_lib4, .-inner_store_l_4x4_lib4
 #endif
+// end
 
 
 
 
 
-//                               w0        x1             x2         x3         x4            x5         x6
+// subroutine INNER_STORE_L_4X4_VS_LIB4
+//
+// input arguments:
+// x8  <- D
+// x9  <- km
+// x10 <- kn
+//
+// output arguments:
+// v16
+
+#if MACRO_LEVEL>=2
+	.macro INNER_STORE_L_4X4_LIB4
+#else
+	.align 4
+	.type inner_store_l_4x4_lib4, %function
+inner_store_l_4x4_lib4:
+#endif
+
+	// if km == return
+	cmp		w9, #4
+	bge		1f
+
+	//
+	ldr		v16, [x8, #32]
+	ldr		v17, [x8, #112]
+
+	cmp		w9, #3
+	bge		1f
+
+	ins		v2.d[0], v16.d[0]
+	ins		v7.d[0], v17.d[0]
+
+	stp		q0, q1, [x8, #0]
+	stp		q2, q3, [x8, #32]
+	str		q5, [x8, #80]
+	str		q7, [x8, #112]
+
+#if MACRO_LEVEL>=2
+	.endm
+#else
+	ret
+
+	.size	inner_store_l_4x4_lib4, .-inner_store_l_4x4_lib4
+#endif
+// end
+
+
+
+
+
 // void kernel_dgemm_nt_4x4_lib4(int kmax, double *alpha, double *A, double *B, double *beta, double *C, double *D)
+//                               w0        x1             x2         x3         x4            x5         x6
 
 	.align	4
 	.global	kernel_dgemm_nt_4x4_lib4
 	.type	kernel_dgemm_nt_4x4_lib4, %function
 kernel_dgemm_nt_4x4_lib4:
-	
+
 
 
 	PROLOGUE
@@ -1139,19 +1212,20 @@ kernel_dgemm_nt_4x4_lib4:
 	ret
 
 	.size	kernel_dgemm_nt_4x4_lib4, .-kernel_dgemm_nt_4x4_lib4
+// end
 
 
 
 
 
-//                                  w0        x1             x2         x3         x4            x5         x6         w7      sp+0
 // void kernel_dgemm_nt_4x4_vs_lib4(int kmax, double *alpha, double *A, double *B, double *beta, double *C, double *D, int m1, int n1)
+//                                  w0        x1             x2         x3         x4            x5         x6         w7      sp+0
 
 	.align	4
 	.global	kernel_dgemm_nt_4x4_vs_lib4
 	.type	kernel_dgemm_nt_4x4_vs_lib4, %function
 kernel_dgemm_nt_4x4_vs_lib4:
-	
+
 
 
 	PROLOGUE
@@ -1216,13 +1290,14 @@ kernel_dgemm_nt_4x4_vs_lib4:
 	ret
 
 	.size	kernel_dgemm_nt_4x4_vs_lib4, .-kernel_dgemm_nt_4x4_vs_lib4
+// end
 
 
 
 
 
-//                                      w0        x1         x2         x3         x4         x5         x6
 // void kernel_dtrsm_nt_rl_inv_4x4_lib4(int kmax, double *A, double *B, double *C, double *D, double *E, double *inv_diag_E);
+//                                      w0        x1         x2         x3         x4         x5         x6
 
 	.align	4
 	.globl kernel_dtrsm_nt_rl_inv_4x4_lib4
@@ -1301,13 +1376,14 @@ kernel_dtrsm_nt_rl_inv_4x4_lib4:
 	ret
 
 	.size	kernel_dtrsm_nt_rl_inv_4x4_lib4, .-kernel_dtrsm_nt_rl_inv_4x4_lib4
+// end
 
 
 
 
 
-//                                  w0        x1         x2         x3         x4         x5
 // void kernel_dpotrf_nt_l_4x4_lib4(int kmax, double *A, double *B, double *C, double *D, double *inv_diag_D);
+//                                  w0        x1         x2         x3         x4         x5
 
 	.align	4
 	.globl kernel_dpotrf_nt_l_4x4_lib4
