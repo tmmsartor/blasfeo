@@ -1541,7 +1541,8 @@ inner_store_4x4_vs_lib4:
 	cmp		w9, #4
 	bge		1f
 
-	// laod D from memory
+	// laod data from memory to write back
+	// into untouched locations
 	ldp		v24, v25, [x8, #(0*8+0*32)]
 	ldp		v26, v27, [x8, #(0*8+1*32)]
 	ldp		v28, v29, [x8, #(0*8+2*32)]
@@ -1665,38 +1666,85 @@ inner_store_l_4x4_lib4:
 // v16
 
 #if MACRO_LEVEL>=2
-	.macro INNER_STORE_L_4X4_LIB4
+	.macro INNER_STORE_L_4X4_VS_LIB4
 #else
 	.align 4
-	.type inner_store_l_4x4_lib4, %function
-inner_store_l_4x4_lib4:
+	.type inner_store_l_4x4_vs_lib4, %function
+inner_store_l_4x4_vs_lib4:
 #endif
 
-	// if km == return
-	cmp		w9, #4
-	bge		1f
-
-	//
-	ldr		v16, [x8, #32]
-	ldr		v17, [x8, #112]
-
-	cmp		w9, #3
-	bge		1f
-
+	// load data for mask full triangular matrix
+	ldr		v16, [x8, #(0*8+1*32)]
+	ldr		v17, [x8, #(2*8+3*32)]
 	ins		v2.d[0], v16.d[0]
 	ins		v7.d[0], v17.d[0]
 
-	stp		q0, q1, [x8, #0]
-	stp		q2, q3, [x8, #32]
-	str		q5, [x8, #80]
-	str		q7, [x8, #112]
+	// if km>4 store all, no mask
+	cmp		w9, #4
+	bge		1f
+
+	// mask rows
+
+	// laod data from memory to write back
+	// into untouched locations
+	ldp		v18, v19, [x8, #(0*8+0*32)]
+	ldr		v20 [x8, #(2*8+1*32)]
+	ldr		v21 [x8, #(2*8+2*32)]
+
+	// store 4th row
+	ins		v1.d[1], v19.d[1]
+	ins		v3.d[1], v20.d[1]
+	ins		v5.d[1], v21.d[1]
+	ins		v7.d[1], v17.d[1]
+
+	// if km>3 store 3th row
+	cmp		w9, #3
+	bge		1f
+
+	ins		v1.d[0], v19.d[0]
+	ins		v3.d[0], v20.d[0]
+	ins		v5.d[0], v21.d[0]
+
+	// if km>2 store 2nd row
+	cmp		w9, #2
+	bge		1f
+
+	ins		v0.d[1], v18.d[1]
+	ins		v2.d[1], v16.d[1]
+
+	// if km>1 store 1st row
+	cmp		w9, #1
+	bge		1f
+
+	ins		v0.d[0], v18.d[0]
+
+// store
+1:
+	// store 1st col
+	stp		v0, v1, [x8, #(0*8+0*32)]
+	// if kn<2 return 1 col
+	cmp		w10, #2
+	blt		0f
+	// store 2nd col
+	stp		v2, v3, [x8, #(0*8+1*32)]
+	// if kn<3 return  2 col
+	cmp		w10, #3
+	blt		0f
+	// store 3rd col
+	str		v5 [x8, #(2*8+2*32)]
+	// if kn=3 return  3 col
+	beq		0f
+	// store 4th col
+	str		v7 [x8, #(2*8+3*32)]
+	// return 4 col
+
 
 #if MACRO_LEVEL>=2
 	.endm
 #else
 	ret
 
-	.size	inner_store_l_4x4_lib4, .-inner_store_l_4x4_lib4
+	.size	inner_store_l_4x4_vs_lib4, .-inner_store_l_4x4_vs_lib4
 #endif
 // end
 
