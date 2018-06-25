@@ -433,7 +433,7 @@ void blasfeo_spotrf_l(int m, struct blasfeo_smat *sC, int ci, int cj, struct bla
 	int i, j, l;
 
 	i = 0;
-#if defined(TARGET_ARMV8A_ARM_CORTEX_A57)
+#if defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 #if 1
 	for(; i<m-15; i+=16)
 		{
@@ -588,7 +588,7 @@ void blasfeo_spotrf_l(int m, struct blasfeo_smat *sC, int ci, int cj, struct bla
 
 	// clean up loops definitions
 
-#if defined(TARGET_ARMV8A_ARM_CORTEX_A57)
+#if defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 	left_16:
 	j = 0;
 	for(; j<i; j+=4)
@@ -609,13 +609,13 @@ void blasfeo_spotrf_l(int m, struct blasfeo_smat *sC, int ci, int cj, struct bla
 	kernel_strsm_nt_rl_inv_4x4_vs_lib4(j+4, &pD[(i+8)*sdd], &pD[(j+4)*sdd], &pC[(j+4)*ps+(i+8)*sdc], &pD[(j+4)*ps+(i+8)*sdd], &pD[(j+4)*ps+(j+4)*sdd], &dD[j+4], m-i-8, m-j-4);
 	kernel_strsm_nt_rl_inv_4x4_vs_lib4(j+4, &pD[(i+12)*sdd], &pD[(j+4)*sdd], &pC[(j+4)*ps+(i+12)*sdc], &pD[(j+4)*ps+(i+12)*sdd], &pD[(j+4)*ps+(j+4)*sdd], &dD[j+4], m-i-12, m-j-4);
 //	kernel_dpotrf_nt_l_8x4_vs_lib4(j+8, &pD[(i+8)*sdd], sdd, &pD[(j+8)*sdd], &pC[(j+8)*ps+(j+8)*sdc], sdc, &pD[(j+8)*ps+(j+8)*sdd], sdd, &dD[j+8], m-i-8, m-j-8);
-	kernel_dpotrf_nt_l_4x4_vs_lib4(j+8, &pD[(i+8)*sdd], &pD[(j+8)*sdd], &pC[(j+8)*ps+(i+8)*sdc], &pD[(j+8)*ps+(i+8)*sdd], &dD[j+8], m-i-8, m-j-8);
+	kernel_spotrf_nt_l_4x4_vs_lib4(j+8, &pD[(i+8)*sdd], &pD[(j+8)*sdd], &pC[(j+8)*ps+(i+8)*sdc], &pD[(j+8)*ps+(i+8)*sdd], &dD[j+8], m-i-8, m-j-8);
 	kernel_strsm_nt_rl_inv_4x4_vs_lib4(j+8, &pD[(i+12)*sdd], &pD[(j+8)*sdd], &pC[(j+8)*ps+(i+12)*sdc], &pD[(j+8)*ps+(i+12)*sdd], &pD[(j+8)*ps+(j+8)*sdd], &dD[j+8], m-i-12, m-j-8);
-	kernel_dpotrf_nt_l_4x4_vs_lib4(j+12, &pD[(i+12)*sdd], &pD[(j+12)*sdd], &pC[(j+12)*ps+(i+12)*sdc], &pD[(j+12)*ps+(i+12)*sdd], &dD[j+12], m-i-12, m-j-12);
+	kernel_spotrf_nt_l_4x4_vs_lib4(j+12, &pD[(i+12)*sdd], &pD[(j+12)*sdd], &pC[(j+12)*ps+(i+12)*sdc], &pD[(j+12)*ps+(i+12)*sdd], &dD[j+12], m-i-12, m-j-12);
 	return;
 #endif
 
-#if defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV7A_ARM_CORTEX_A15)
+#if defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53) || defined(TARGET_ARMV7A_ARM_CORTEX_A15)
 	left_12:
 	if(m-i==12)
 		{
@@ -645,12 +645,12 @@ void blasfeo_spotrf_l(int m, struct blasfeo_smat *sC, int ci, int cj, struct bla
 	//	kernel_dpotrf_nt_l_8x4_vs_lib4(j+4, &pD[(i+4)*sdd], sdd, &pD[(j+4)*sdd], &pC[(j+4)*ps+(j+4)*sdc], sdc, &pD[(j+4)*ps+(j+4)*sdd], sdd, &dD[j+4], m-i-4, m-j-4);
 		kernel_spotrf_nt_l_4x4_vs_lib4(j+4, &pD[(i+4)*sdd], &pD[(j+4)*sdd], &pC[(j+4)*ps+(j+4)*sdc], &pD[(j+4)*ps+(j+4)*sdd], &dD[j+4], m-i-4, m-j-4);
 		kernel_strsm_nt_rl_inv_4x4_vs_lib4(j+4, &pD[(i+8)*sdd], &pD[(j+4)*sdd], &pC[(j+4)*ps+(i+8)*sdc], &pD[(j+4)*ps+(i+8)*sdd], &pD[(j+4)*ps+(j+4)*sdd], &dD[j+4], m-i-8, m-j-4);
-		kernel_dpotrf_nt_l_4x4_vs_lib4(j+8, &pD[(i+8)*sdd], &pD[(j+8)*sdd], &pC[(j+8)*ps+(i+8)*sdc], &pD[(j+8)*ps+(i+8)*sdd], &dD[j+8], m-i-8, m-j-8);
+		kernel_spotrf_nt_l_4x4_vs_lib4(j+8, &pD[(i+8)*sdd], &pD[(j+8)*sdd], &pC[(j+8)*ps+(i+8)*sdc], &pD[(j+8)*ps+(i+8)*sdd], &dD[j+8], m-i-8, m-j-8);
 		}
 	return;
 #endif
 
-#if defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV7A_ARM_CORTEX_A15)
+#if defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53) || defined(TARGET_ARMV7A_ARM_CORTEX_A15)
 	left_8:
 	if(m-i==8)
 		{
@@ -874,8 +874,6 @@ void blasfeo_sgetrf_rowpivot(int m, int n, struct blasfeo_smat *sC, int ci, int 
 
 int blasfeo_sgeqrf_worksize(int m, int n)
 	{
-	printf("\nblasfeo_sgeqrf_worksize: feature not implemented yet\n");
-	exit(1);
 	return 0;
 	}
 
@@ -888,6 +886,65 @@ void blasfeo_sgeqrf(int m, int n, struct blasfeo_smat *sC, int ci, int cj, struc
 	printf("\nblasfeo_sgeqrf: feature not implemented yet\n");
 	exit(1);
 	return;
+	}
+
+
+
+int blasfeo_sgelqf_worksize(int m, int n)
+	{
+	return 0;
+	}
+
+
+
+void blasfeo_sgelqf(int m, int n, struct blasfeo_smat *sC, int ci, int cj, struct blasfeo_smat *sD, int di, int dj, void *work)
+	{
+	if(m<=0 | n<=0)
+		return;
+	printf("\nblasfeo_sgelqf: feature not implemented yet\n");
+	exit(1);
+	return;
+	}
+
+
+
+// LQ factorization with positive diagonal elements
+void blasfeo_sgelqf_pd(int m, int n, struct blasfeo_smat *sC, int ci, int cj, struct blasfeo_smat *sD, int di, int dj, void *work)
+	{
+	if(m<=0 | n<=0)
+		return;
+	printf("\nblasfeo_sgelqf_pd: feature not implemented yet\n");
+	exit(1);
+	return;
+	}
+
+
+
+// LQ factorization with positive diagonal elements, array of matrices
+// [L, A] <= lq( [L. A] )
+// L lower triangular, of size (m)x(m)
+// A full of size (m)x(n1)
+void blasfeo_sgelqf_pd_la(int m, int n1, struct blasfeo_smat *sD, int di, int dj, struct blasfeo_smat *sA, int ai, int aj, void *work)
+	{
+	if(m<=0)
+		return;
+	printf("\nblasfeo_sgelqf_pd_la: feature not implemented yet\n");
+	exit(1);
+	return;
+	}
+
+
+
+// LQ factorization with positive diagonal elements, array of matrices
+// [L, L, A] <= lq( [L. L, A] )
+// L lower triangular, of size (m)x(m)
+// A full of size (m)x(n1)
+void blasfeo_sgelqf_pd_lla(int m, int n1, struct blasfeo_smat *sD, int di, int dj, struct blasfeo_smat *sL, int li, int lj, struct blasfeo_smat *sA, int ai, int aj, void *work)
+	{
+	if(m<=0)
+		return;
+	printf("\nblasfeo_dgelqf_pd_lla: feature not implemented yet\n");
+	exit(1);
 	}
 
 

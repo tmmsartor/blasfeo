@@ -270,11 +270,29 @@ void kernel_dgelqf_dlarft12_12_lib4(int n, double *pD, int sdd, double *dD, doub
 void kernel_dgelqf_dlarft4_12_lib4(int n, double *pD, int sdd, double *dD, double *pT);
 void kernel_dgelqf_dlarft4_8_lib4(int n, double *pD, int sdd, double *dD, double *pT);
 void kernel_dgelqf_dlarft4_4_lib4(int n, double *pD, double *dD, double *pT);
+void kernel_dlarfb12_r_12_lib4(int kmax, double *pV, int sdd, double *pT, double *pD, double *pK);
 void kernel_dlarfb12_r_4_lib4(int kmax, double *pV, int sdd, double *pT, double *pD, double *pK, int km);
 void kernel_dlarfb4_r_12_lib4(int kmax, double *pV, double *pT, double *pD, int sdd);
 void kernel_dlarfb4_r_8_lib4(int kmax, double *pV, double *pT, double *pD, int sdd);
 void kernel_dlarfb4_r_4_lib4(int kmax, double *pV, double *pT, double *pD);
 void kernel_dlarfb4_r_1_lib4(int kmax, double *pV, double *pT, double *pD);
+void kernel_dgelqf_pd_dlarft12_12_lib4(int n, double *pD, int sdd, double *dD, double *pT);
+void kernel_dgelqf_pd_dlarft4_8_lib4(int n, double *pD, int sdd, double *dD, double *pT);
+void kernel_dgelqf_pd_dlarft4_4_lib4(int n, double *pD, double *dD, double *pT);
+void kernel_dgelqf_pd_4_lib4(int n, double *pD, double *dD);
+void kernel_dgelqf_pd_vs_lib4(int m, int n, int k, int offD, double *pD, int sdd, double *dD);
+void kernel_dgelqf_pd_la_vs_lib4(int m, int n1, int k, int offD, double *pD, int sdd, double *dD, int offA, double *pA, int sda);
+void kernel_dlarft_4_la_lib4(int n1, double *dD, double *pA, double *pT);
+void kernel_dlarfb4_r_12_la_lib4(int n1, double *pVA, double *pT, double *pD, int sdd, double *pA, int sda);
+void kernel_dlarfb4_r_8_la_lib4(int n1, double *pVA, double *pT, double *pD, int sdd, double *pA, int sda);
+void kernel_dlarfb4_r_4_la_lib4(int n1, double *pVA, double *pT, double *pD, double *pA);
+void kernel_dlarfb4_r_1_la_lib4(int n1, double *pVA, double *pT, double *pD, double *pA);
+void kernel_dgelqf_pd_lla_vs_lib4(int m, int n0, int n1, int k, int offD, double *pD, int sdd, double *dD, int offL, double *pL, int sdl, int offA, double *pA, int sda);
+void kernel_dlarft_4_lla_lib4(int n0, int n1, double *dD, double *pL, double *pA, double *pT);
+void kernel_dlarfb4_r_12_lla_lib4(int n0, int n1, double *pVL, double *pVA, double *pT, double *pD, int sdd, double *pL, int sdl, double *pA, int sda);
+void kernel_dlarfb4_r_8_lla_lib4(int n0, int n1, double *pVL, double *pVA, double *pT, double *pD, int sdd, double *pL, int sdl, double *pA, int sda);
+void kernel_dlarfb4_r_4_lla_lib4(int n0, int n1, double *pVL, double *pVA, double *pT, double *pD, double *pL, double *pA);
+void kernel_dlarfb4_r_1_lla_lib4(int n0, int n1, double *pVL, double *pVA, double *pT, double *pD, double *pL, double *pA);
 
 
 

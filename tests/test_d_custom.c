@@ -38,16 +38,16 @@
 #include "../include/blasfeo_d_kernel.h"
 #include "../include/blasfeo_d_blas.h"
 
-#include "test_d_common.h"
-#include "test_x_common.c"
+//#include "test_d_common.h"
+//#include "test_x_common.c"
 
 int main()
 	{
-	print_compilation_flags();
+//	print_compilation_flags();
 
 	int ii;
 
-	int n = 8;
+	int n = 12;
 
 	//
 	// matrices in column-major format
@@ -200,6 +200,90 @@ int main()
 	struct blasfeo_dvec svm; blasfeo_create_dvec(n, &svm, vm);
 	struct blasfeo_dvec sm; blasfeo_create_dvec(n, &sm, m);
 	struct blasfeo_dvec sr; blasfeo_create_dvec(n, &sr, r);
+
+	double alpha, beta;
+
+
+
+#if 0
+	// potrf
+	alpha = 1.0;
+	beta = 1.0;
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	blasfeo_dgemm_nt(n, n, n, alpha, &sA, 0, 0, &sA, 0, 0, beta, &sB, 0, 0, &sD, 0, 0);
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	blasfeo_dpotrf_l(n, &sD, 0, 0, &sD, 0, 0);
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+
+
+#if 0
+	// gemm_nt
+	alpha = 1.0;
+	beta = 0.0;
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+
+	kernel_dgemm_nt_4x4_lib4(4, &alpha, sA.pA, sB.pA, &beta, sA.pA, sD.pA);
+//	kernel_dgemm_nt_4x4_lib4(4, &alpha, sA.pA, sB.pA+1*4*sB.cn, &beta, sD.pA+1*4*4, sD.pA+1*4*4);
+//	kernel_dgemm_nt_4x4_vs_lib4(4, &alpha, sA.pA, sB.pA, &beta, sD.pA, sD.pA, 4, 4);
+
+//	kernel_dgemm_nt_8x4_lib4(n, &alpha, sA.pA, sA.cn, sB.pA, &beta, sD.pA, sD.cn, sD.pA, sD.cn);
+
+//	kernel_dgemm_nt_12x4_lib4(8, &alpha, sA.pA, sA.cn, sB.pA, &beta, sD.pA, sD.cn, sD.pA, sD.cn);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+
+
+#if 1
+	// gemm_nn
+	alpha = 1.0;
+	beta = 0.0;
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+
+//	kernel_dgemm_nn_4x4_lib4(4, &alpha, sB.pA, 0, sA.pA, sA.cn, &beta, sA.pA, sD.pA);
+
+	blasfeo_dgemm_nn(n, n, n, alpha, &sA, 0, 0, &sB, 0, 0, beta, &sD, 0, 0, &sD, 0, 0);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+
+
+	// array lq
+	struct blasfeo_dmat lq0; blasfeo_allocate_dmat(n, 2*n, &lq0);
+	struct blasfeo_dmat lq1; blasfeo_allocate_dmat(n, 2*n, &lq1);
+
+	void *lq0_work = malloc(blasfeo_dgelqf_worksize(n, 2*n));
+
+	blasfeo_pack_dmat(n, n, A, n, &lq0, 0, n);
+	blasfeo_pack_dmat(n, n, B, n, &lq0, 0, 0);
+
+	blasfeo_print_dmat(n, 2*n, &lq0, 0, 0);
+
+	blasfeo_dgelqf_pd(n, 2*n, &lq0, 0, 0, &lq0, 0, 0, lq0_work);
+//	blasfeo_dgelqf_pd_la(n, n, &lq0, 0, 0, &lq0, 0, n, lq0_work);
+
+	blasfeo_print_dmat(n, 2*n, &lq0, 0, 0);
+
+	blasfeo_dtrcp_l(n, &lq0, 0, 0, &lq1, 0, 0);
+	blasfeo_pack_dmat(n, n, B, n, &lq1, 0, n);
+
+	blasfeo_print_dmat(n, 2*n, &lq1, 0, 0);
+
+//	blasfeo_dgelqf_pd(n, 2*n, &lq1, 0, 0, &lq1, 0, 0, lq0_work);
+//	blasfeo_dgelqf_pd_la(n, n, &lq1, 0, 0, &lq1, 0, n, lq0_work);
+	blasfeo_dgelqf_pd_lla(n, 0, &lq1, 0, 0, &lq1, 0, n, &lq1, 0, 2*n, lq0_work);
+
+	blasfeo_print_dmat(n, 2*n, &lq1, 0, 0);
+
+	return 0;
+
 
 //	blasfeo_print_tran_dvec(n, &sv, 0);
 //	blasfeo_print_tran_dvec(n, &svp, 0);
@@ -374,8 +458,8 @@ int main()
 	return 0;
 #endif
 
-	double alpha = 1.0;
-	double beta = 1.0;
+	alpha = 1.0;
+	beta = 1.0;
 	blasfeo_print_dmat(n, n, &sD, 0, 0);
 //	kernel_dgemm_nn_4x8_lib4(n, &alpha, sA.pA, 0, sB.pA, sB.cn, &beta, sD.pA, sD.pA);
 //	kernel_dgemm_nn_4x8_vs_lib4(n, &alpha, sA.pA, 0, sB.pA, sB.cn, &beta, sD.pA, sD.pA, 4, 8);
@@ -789,8 +873,10 @@ int main()
 //	blasfeo_free_dmat(&sB);
 //	blasfeo_free_dmat(&sD);
 	v_free_align(memory_strmat);
+	blasfeo_free_dmat(&lq0);
+	free(lq0_work);
 
 	return 0;
 
-	print_compilation_flags();
+//	print_compilation_flags();
 	}
