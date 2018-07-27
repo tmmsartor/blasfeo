@@ -35,6 +35,10 @@ ifeq ($(LA), HIGH_PERFORMANCE)
 ifeq ($(TARGET), X86_AMD_JAGUAR)
 OBJS += \
 		kernel_dgemm_4x4_lib4.o \
+		kernel_dgemv_4_lib4.o \
+		\
+		kernel_sgemm_4x4_lib4.o \
+		kernel_sgemv_4_lib4.o \
 
 endif
 

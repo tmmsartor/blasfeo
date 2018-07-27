@@ -30,7 +30,7 @@
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dgemm_nt_4x4_gen_lib4(int kmax, double *alpha, double *A, double *B, double *beta, int offsetC, double *C0, int sdc, int offsetD, double *D0, int sdd, int m0, int m1, int n0, int n1)
 	{
 
@@ -522,7 +522,7 @@ void kernel_dgemm_nt_4x4_gen_lib4(int kmax, double *alpha, double *A, double *B,
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_ARMV7A_ARM_CORTEX_A15)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_ARMV7A_ARM_CORTEX_A15)
 void kernel_dgemm_nt_4x4_vs_lib4(int kmax, double *alpha, double *A, double *B, double *beta, double *C, double *D, int km, int kn)
 	{
 
@@ -838,12 +838,14 @@ void kernel_dgemm_nt_4x4_vs_lib4(int kmax, double *alpha, double *A, double *B, 
 		D[0+bs*3] = c_03;
 		}
 
+	return;
+
 	}
 #endif
 
 
 
-#if defined(TARGET_GENERIC)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA)
 void kernel_dgemm_nt_4x4_lib4(int kmax, double *alpha, double *A, double *B, double *beta, double *C, double *D)
 	{
 	kernel_dgemm_nt_4x4_vs_lib4(kmax, alpha, A, B, beta, C, D, 4, 4);
@@ -852,7 +854,7 @@ void kernel_dgemm_nt_4x4_lib4(int kmax, double *alpha, double *A, double *B, dou
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dgemm_nn_4x4_gen_lib4(int kmax, double *alpha, double *A, int offsetB, double *B, int sdb, double *beta, int offsetC, double *C0, int sdc, int offsetD, double *D0, int sdd, int m0, int m1, int n0, int n1)
 	{
 
@@ -1583,16 +1585,581 @@ void kernel_dgemm_nn_4x4_gen_lib4(int kmax, double *alpha, double *A, int offset
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
-void kernel_dgemm_nn_4x4_lib4(int kmax, double *alpha, double *A, int offsetB, double *B, int sdb, double *beta, double *C, double *D)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+void kernel_dgemm_nn_4x4_vs_lib4(int kmax, double *alpha, double *A, int offsetB, double *B, int sdb, double *beta, double *C, double *D, int km, int kn)
 	{
-	kernel_dgemm_nn_4x4_gen_lib4(kmax, alpha, A, offsetB, B, sdb, beta, 0, C, 0, 0, D, 0, 0, 4, 0, 4);
+
+	const int bs = 4;
+
+	double
+		a_0, a_1, a_2, a_3,
+		b_0, b_1, b_2, b_3,
+		c_00=0, c_01=0, c_02=0, c_03=0,
+		c_10=0, c_11=0, c_12=0, c_13=0,
+		c_20=0, c_21=0, c_22=0, c_23=0,
+		c_30=0, c_31=0, c_32=0, c_33=0;
+	
+	double
+		*C1, *D1;
+	
+	int k;
+
+	k = 0;
+	if(offsetB!=0)
+		{
+		if(offsetB==1)
+			{
+
+			B += 1;
+
+			a_0 = A[0];
+			a_1 = A[1];
+			a_2 = A[2];
+			a_3 = A[3];
+
+			b_0 = B[0];
+			b_1 = B[4];
+			b_2 = B[8];
+			b_3 = B[12];
+
+			c_00 += a_0 * b_0;
+			c_10 += a_1 * b_0;
+			c_20 += a_2 * b_0;
+			c_30 += a_3 * b_0;
+
+			c_01 += a_0 * b_1;
+			c_11 += a_1 * b_1;
+			c_21 += a_2 * b_1;
+			c_31 += a_3 * b_1;
+
+			c_02 += a_0 * b_2;
+			c_12 += a_1 * b_2;
+			c_22 += a_2 * b_2;
+			c_32 += a_3 * b_2;
+
+			c_03 += a_0 * b_3;
+			c_13 += a_1 * b_3;
+			c_23 += a_2 * b_3;
+			c_33 += a_3 * b_3;
+
+			A += 4;
+			B += 1;
+			k += 1;
+
+			if(k>=kmax)
+				goto scale;
+
+			a_0 = A[0];
+			a_1 = A[1];
+			a_2 = A[2];
+			a_3 = A[3];
+
+			b_0 = B[0];
+			b_1 = B[4];
+			b_2 = B[8];
+			b_3 = B[12];
+
+			c_00 += a_0 * b_0;
+			c_10 += a_1 * b_0;
+			c_20 += a_2 * b_0;
+			c_30 += a_3 * b_0;
+
+			c_01 += a_0 * b_1;
+			c_11 += a_1 * b_1;
+			c_21 += a_2 * b_1;
+			c_31 += a_3 * b_1;
+
+			c_02 += a_0 * b_2;
+			c_12 += a_1 * b_2;
+			c_22 += a_2 * b_2;
+			c_32 += a_3 * b_2;
+
+			c_03 += a_0 * b_3;
+			c_13 += a_1 * b_3;
+			c_23 += a_2 * b_3;
+			c_33 += a_3 * b_3;
+
+			A += 4;
+			B += 1;
+			k += 1;
+
+			if(k>=kmax)
+				goto scale;
+
+			a_0 = A[0];
+			a_1 = A[1];
+			a_2 = A[2];
+			a_3 = A[3];
+
+			b_0 = B[0];
+			b_1 = B[4];
+			b_2 = B[8];
+			b_3 = B[12];
+
+			c_00 += a_0 * b_0;
+			c_10 += a_1 * b_0;
+			c_20 += a_2 * b_0;
+			c_30 += a_3 * b_0;
+
+			c_01 += a_0 * b_1;
+			c_11 += a_1 * b_1;
+			c_21 += a_2 * b_1;
+			c_31 += a_3 * b_1;
+
+			c_02 += a_0 * b_2;
+			c_12 += a_1 * b_2;
+			c_22 += a_2 * b_2;
+			c_32 += a_3 * b_2;
+
+			c_03 += a_0 * b_3;
+			c_13 += a_1 * b_3;
+			c_23 += a_2 * b_3;
+			c_33 += a_3 * b_3;
+
+			A += 4;
+			B += 1;
+			B += bs*(sdb-1);
+			k += 1;
+
+			}
+		else if(offsetB==2)
+			{
+
+			B += 2;
+
+			a_0 = A[0];
+			a_1 = A[1];
+			a_2 = A[2];
+			a_3 = A[3];
+
+			b_0 = B[0];
+			b_1 = B[4];
+			b_2 = B[8];
+			b_3 = B[12];
+
+			c_00 += a_0 * b_0;
+			c_10 += a_1 * b_0;
+			c_20 += a_2 * b_0;
+			c_30 += a_3 * b_0;
+
+			c_01 += a_0 * b_1;
+			c_11 += a_1 * b_1;
+			c_21 += a_2 * b_1;
+			c_31 += a_3 * b_1;
+
+			c_02 += a_0 * b_2;
+			c_12 += a_1 * b_2;
+			c_22 += a_2 * b_2;
+			c_32 += a_3 * b_2;
+
+			c_03 += a_0 * b_3;
+			c_13 += a_1 * b_3;
+			c_23 += a_2 * b_3;
+			c_33 += a_3 * b_3;
+
+			A += 4;
+			B += 1;
+			k += 1;
+
+			if(k>=kmax)
+				goto scale;
+
+			a_0 = A[0];
+			a_1 = A[1];
+			a_2 = A[2];
+			a_3 = A[3];
+
+			b_0 = B[0];
+			b_1 = B[4];
+			b_2 = B[8];
+			b_3 = B[12];
+
+			c_00 += a_0 * b_0;
+			c_10 += a_1 * b_0;
+			c_20 += a_2 * b_0;
+			c_30 += a_3 * b_0;
+
+			c_01 += a_0 * b_1;
+			c_11 += a_1 * b_1;
+			c_21 += a_2 * b_1;
+			c_31 += a_3 * b_1;
+
+			c_02 += a_0 * b_2;
+			c_12 += a_1 * b_2;
+			c_22 += a_2 * b_2;
+			c_32 += a_3 * b_2;
+
+			c_03 += a_0 * b_3;
+			c_13 += a_1 * b_3;
+			c_23 += a_2 * b_3;
+			c_33 += a_3 * b_3;
+
+			A += 4;
+			B += 1;
+			B += bs*(sdb-1);
+			k += 1;
+
+			}
+		else // if(offsetB==3)
+			{
+
+			B += 3;
+
+			a_0 = A[0];
+			a_1 = A[1];
+			a_2 = A[2];
+			a_3 = A[3];
+
+			b_0 = B[0];
+			b_1 = B[4];
+			b_2 = B[8];
+			b_3 = B[12];
+
+			c_00 += a_0 * b_0;
+			c_10 += a_1 * b_0;
+			c_20 += a_2 * b_0;
+			c_30 += a_3 * b_0;
+
+			c_01 += a_0 * b_1;
+			c_11 += a_1 * b_1;
+			c_21 += a_2 * b_1;
+			c_31 += a_3 * b_1;
+
+			c_02 += a_0 * b_2;
+			c_12 += a_1 * b_2;
+			c_22 += a_2 * b_2;
+			c_32 += a_3 * b_2;
+
+			c_03 += a_0 * b_3;
+			c_13 += a_1 * b_3;
+			c_23 += a_2 * b_3;
+			c_33 += a_3 * b_3;
+
+			A += 4;
+			B += 1;
+			B += bs*(sdb-1);
+			k += 1;
+
+			}
+		}
+	for(; k<kmax-3; k+=4)
+		{
+
+		// k = 0
+
+		a_0 = A[0];
+		a_1 = A[1];
+		a_2 = A[2];
+		a_3 = A[3];
+
+		b_0 = B[0];
+		b_1 = B[4];
+		b_2 = B[8];
+		b_3 = B[12];
+
+		c_00 += a_0 * b_0;
+		c_10 += a_1 * b_0;
+		c_20 += a_2 * b_0;
+		c_30 += a_3 * b_0;
+
+		c_01 += a_0 * b_1;
+		c_11 += a_1 * b_1;
+		c_21 += a_2 * b_1;
+		c_31 += a_3 * b_1;
+
+		c_02 += a_0 * b_2;
+		c_12 += a_1 * b_2;
+		c_22 += a_2 * b_2;
+		c_32 += a_3 * b_2;
+
+		c_03 += a_0 * b_3;
+		c_13 += a_1 * b_3;
+		c_23 += a_2 * b_3;
+		c_33 += a_3 * b_3;
+
+
+		// k = 1
+
+		a_0 = A[4];
+		a_1 = A[5];
+		a_2 = A[6];
+		a_3 = A[7];
+
+		b_0 = B[1];
+		b_1 = B[5];
+		b_2 = B[9];
+		b_3 = B[13];
+
+		c_00 += a_0 * b_0;
+		c_10 += a_1 * b_0;
+		c_20 += a_2 * b_0;
+		c_30 += a_3 * b_0;
+
+		c_01 += a_0 * b_1;
+		c_11 += a_1 * b_1;
+		c_21 += a_2 * b_1;
+		c_31 += a_3 * b_1;
+
+		c_02 += a_0 * b_2;
+		c_12 += a_1 * b_2;
+		c_22 += a_2 * b_2;
+		c_32 += a_3 * b_2;
+
+		c_03 += a_0 * b_3;
+		c_13 += a_1 * b_3;
+		c_23 += a_2 * b_3;
+		c_33 += a_3 * b_3;
+
+
+		// k = 2
+
+		a_0 = A[8];
+		a_1 = A[9];
+		a_2 = A[10];
+		a_3 = A[11];
+
+		b_0 = B[2];
+		b_1 = B[6];
+		b_2 = B[10];
+		b_3 = B[14];
+
+		c_00 += a_0 * b_0;
+		c_10 += a_1 * b_0;
+		c_20 += a_2 * b_0;
+		c_30 += a_3 * b_0;
+
+		c_01 += a_0 * b_1;
+		c_11 += a_1 * b_1;
+		c_21 += a_2 * b_1;
+		c_31 += a_3 * b_1;
+
+		c_02 += a_0 * b_2;
+		c_12 += a_1 * b_2;
+		c_22 += a_2 * b_2;
+		c_32 += a_3 * b_2;
+
+		c_03 += a_0 * b_3;
+		c_13 += a_1 * b_3;
+		c_23 += a_2 * b_3;
+		c_33 += a_3 * b_3;
+
+
+		// k = 3
+
+		a_0 = A[12];
+		a_1 = A[13];
+		a_2 = A[14];
+		a_3 = A[15];
+
+		b_0 = B[3];
+		b_1 = B[7];
+		b_2 = B[11];
+		b_3 = B[15];
+
+		c_00 += a_0 * b_0;
+		c_10 += a_1 * b_0;
+		c_20 += a_2 * b_0;
+		c_30 += a_3 * b_0;
+
+		c_01 += a_0 * b_1;
+		c_11 += a_1 * b_1;
+		c_21 += a_2 * b_1;
+		c_31 += a_3 * b_1;
+
+		c_02 += a_0 * b_2;
+		c_12 += a_1 * b_2;
+		c_22 += a_2 * b_2;
+		c_32 += a_3 * b_2;
+
+		c_03 += a_0 * b_3;
+		c_13 += a_1 * b_3;
+		c_23 += a_2 * b_3;
+		c_33 += a_3 * b_3;
+
+		A += 16;
+		B += 4*sdb;
+
+		}
+	for(; k<kmax; k++)
+		{
+
+		// k = 0
+
+		a_0 = A[0];
+		a_1 = A[1];
+		a_2 = A[2];
+		a_3 = A[3];
+
+		b_0 = B[0];
+		b_1 = B[4];
+		b_2 = B[8];
+		b_3 = B[12];
+
+		c_00 += a_0 * b_0;
+		c_10 += a_1 * b_0;
+		c_20 += a_2 * b_0;
+		c_30 += a_3 * b_0;
+
+		c_01 += a_0 * b_1;
+		c_11 += a_1 * b_1;
+		c_21 += a_2 * b_1;
+		c_31 += a_3 * b_1;
+
+		c_02 += a_0 * b_2;
+		c_12 += a_1 * b_2;
+		c_22 += a_2 * b_2;
+		c_32 += a_3 * b_2;
+
+		c_03 += a_0 * b_3;
+		c_13 += a_1 * b_3;
+		c_23 += a_2 * b_3;
+		c_33 += a_3 * b_3;
+
+		A += 4;
+		B += 1;
+
+		}	
+	
+	scale:
+
+	c_00 = beta[0]*C[0+bs*0] + alpha[0]*c_00;
+	c_10 = beta[0]*C[1+bs*0] + alpha[0]*c_10;
+	c_20 = beta[0]*C[2+bs*0] + alpha[0]*c_20;
+	c_30 = beta[0]*C[3+bs*0] + alpha[0]*c_30;
+
+	c_01 = beta[0]*C[0+bs*1] + alpha[0]*c_01;
+	c_11 = beta[0]*C[1+bs*1] + alpha[0]*c_11;
+	c_21 = beta[0]*C[2+bs*1] + alpha[0]*c_21;
+	c_31 = beta[0]*C[3+bs*1] + alpha[0]*c_31;
+
+	c_02 = beta[0]*C[0+bs*2] + alpha[0]*c_02;
+	c_12 = beta[0]*C[1+bs*2] + alpha[0]*c_12;
+	c_22 = beta[0]*C[2+bs*2] + alpha[0]*c_22;
+	c_32 = beta[0]*C[3+bs*2] + alpha[0]*c_32;
+
+	c_03 = beta[0]*C[0+bs*3] + alpha[0]*c_03;
+	c_13 = beta[0]*C[1+bs*3] + alpha[0]*c_13;
+	c_23 = beta[0]*C[2+bs*3] + alpha[0]*c_23;
+	c_33 = beta[0]*C[3+bs*3] + alpha[0]*c_33;
+
+	if(km>=4)
+		{
+		D[0+bs*0] = c_00;
+		D[1+bs*0] = c_10;
+		D[2+bs*0] = c_20;
+		D[3+bs*0] = c_30;
+
+		if(kn==1)
+			return;
+
+		D[0+bs*1] = c_01;
+		D[1+bs*1] = c_11;
+		D[2+bs*1] = c_21;
+		D[3+bs*1] = c_31;
+
+		if(kn==2)
+			return;
+
+		D[0+bs*2] = c_02;
+		D[1+bs*2] = c_12;
+		D[2+bs*2] = c_22;
+		D[3+bs*2] = c_32;
+
+		if(kn==3)
+			return;
+
+		D[0+bs*3] = c_03;
+		D[1+bs*3] = c_13;
+		D[2+bs*3] = c_23;
+		D[3+bs*3] = c_33;
+		}
+	else if(km>=3)
+		{
+		D[0+bs*0] = c_00;
+		D[1+bs*0] = c_10;
+		D[2+bs*0] = c_20;
+
+		if(kn==1)
+			return;
+
+		D[0+bs*1] = c_01;
+		D[1+bs*1] = c_11;
+		D[2+bs*1] = c_21;
+
+		if(kn==2)
+			return;
+
+		D[0+bs*2] = c_02;
+		D[1+bs*2] = c_12;
+		D[2+bs*2] = c_22;
+
+		if(kn==3)
+			return;
+
+		D[0+bs*3] = c_03;
+		D[1+bs*3] = c_13;
+		D[2+bs*3] = c_23;
+		}
+	else if(km>=2)
+		{
+		D[0+bs*0] = c_00;
+		D[1+bs*0] = c_10;
+
+		if(kn==1)
+			return;
+
+		D[0+bs*1] = c_01;
+		D[1+bs*1] = c_11;
+
+		if(kn==2)
+			return;
+
+		D[0+bs*2] = c_02;
+		D[1+bs*2] = c_12;
+
+		if(kn==3)
+			return;
+
+		D[0+bs*3] = c_03;
+		D[1+bs*3] = c_13;
+		}
+	else //if(km>=1)
+		{
+		D[0+bs*0] = c_00;
+
+		if(kn==1)
+			return;
+
+		D[0+bs*1] = c_01;
+
+		if(kn==2)
+			return;
+
+		D[0+bs*2] = c_02;
+
+		if(kn==3)
+			return;
+
+		D[0+bs*3] = c_03;
+		}
+
+	return;
+
 	}
 #endif
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+void kernel_dgemm_nn_4x4_lib4(int kmax, double *alpha, double *A, int offsetB, double *B, int sdb, double *beta, double *C, double *D)
+	{
+	kernel_dgemm_nn_4x4_vs_lib4(kmax, alpha, A, offsetB, B, sdb, beta, C, D, 4, 4);
+	}
+#endif
+
+
+
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dsyrk_nt_l_4x4_gen_lib4(int kmax, double *alpha, double *A, double *B, double *beta, int offsetC, double *C0, int sdc, int offsetD, double *D0, int sdd, int m0, int m1, int n0, int n1)
 	{
 
@@ -1992,7 +2559,7 @@ void kernel_dsyrk_nt_l_4x4_gen_lib4(int kmax, double *alpha, double *A, double *
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dsyrk_nt_l_4x4_vs_lib4(int kmax, double *alpha, double *A, double *B, double *beta, double *C, double *D, int km, int kn)
 	{
 
@@ -2233,7 +2800,7 @@ void kernel_dsyrk_nt_l_4x4_vs_lib4(int kmax, double *alpha, double *A, double *B
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dsyrk_nt_l_4x4_lib4(int kmax, double *alpha, double *A, double *B, double *beta, double *C, double *D)
 	{
 	kernel_dsyrk_nt_l_4x4_vs_lib4(kmax, alpha, A, B, beta, C, D, 4, 4);
@@ -2242,7 +2809,7 @@ void kernel_dsyrk_nt_l_4x4_lib4(int kmax, double *alpha, double *A, double *B, d
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrmm_nt_ru_4x4_vs_lib4(int kmax, double *alpha, double *A, double *B, double *beta, double *C, double *D, int km, int kn)
 	{
 
@@ -2644,7 +3211,7 @@ void kernel_dtrmm_nt_ru_4x4_vs_lib4(int kmax, double *alpha, double *A, double *
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrmm_nt_ru_4x4_lib4(int k, double *alpha, double *A, double *B, double *beta, double *C, double *D)
 	{
 	kernel_dtrmm_nt_ru_4x4_vs_lib4(k, alpha, A, B, beta, C, D, 4, 4);
@@ -2653,7 +3220,7 @@ void kernel_dtrmm_nt_ru_4x4_lib4(int k, double *alpha, double *A, double *B, dou
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrmm_nn_rl_4x4_gen_lib4(int kmax, double *alpha, double *A, int offsetB, double *B, int sdb, int offsetD, double *D0, int sdd, int m0, int m1, int n0, int n1)
 	{
 
@@ -3620,7 +4187,7 @@ void kernel_dtrmm_nn_rl_4x4_gen_lib4(int kmax, double *alpha, double *A, int off
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR)  || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR)  || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrmm_nn_rl_4x4_lib4(int kmax, double *alpha, double *A, int offsetB, double *B, int sdb, double *D)
 	{
 	kernel_dtrmm_nn_rl_4x4_gen_lib4(kmax, alpha, A, offsetB, B, sdb, 0, D, 0, 0, 4, 0, 4);
@@ -3629,7 +4196,7 @@ void kernel_dtrmm_nn_rl_4x4_lib4(int kmax, double *alpha, double *A, int offsetB
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dpotrf_nt_l_4x4_vs_lib4(int kmax, double *A, double *B, double *C, double *D, double *inv_diag_D, int km, int kn)
 	{
 
@@ -4027,7 +4594,7 @@ void kernel_dpotrf_nt_l_4x4_vs_lib4(int kmax, double *A, double *B, double *C, d
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR)
 void kernel_dpotrf_nt_l_4x4_lib4(int kmax, double *A, double *B, double *C, double *D, double *inv_diag_D)
 	{
 	kernel_dpotrf_nt_l_4x4_vs_lib4(kmax, A, B, C, D, inv_diag_D, 4, 4);
@@ -4036,7 +4603,7 @@ void kernel_dpotrf_nt_l_4x4_lib4(int kmax, double *A, double *B, double *C, doub
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dsyrk_dpotrf_nt_l_4x4_vs_lib4(int kp, double *Ap, double *Bp, int km_, double *Am, double *Bm, double *C, double *D, double *inv_diag_D, int km, int kn)
 	{
 	double alpha = 1.0;
@@ -4048,7 +4615,7 @@ void kernel_dsyrk_dpotrf_nt_l_4x4_vs_lib4(int kp, double *Ap, double *Bp, int km
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dsyrk_dpotrf_nt_l_4x4_lib4(int kp, double *Ap, double *Bp, int km_, double *Am, double *Bm, double *C, double *D, double *inv_diag_D)
 	{
 	double alpha = 1.0;
@@ -4060,7 +4627,7 @@ void kernel_dsyrk_dpotrf_nt_l_4x4_lib4(int kp, double *Ap, double *Bp, int km_, 
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nt_rl_inv_4x4_vs_lib4(int kmax, double *A, double *B, double *C, double *D, double *E, double *inv_diag_E, int km, int kn)
 	{
 
@@ -4448,7 +5015,7 @@ void kernel_dtrsm_nt_rl_inv_4x4_vs_lib4(int kmax, double *A, double *B, double *
 
 
 
-#if defined(TARGET_GENERIC)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA)
 void kernel_dtrsm_nt_rl_inv_4x4_lib4(int k, double *A, double *B, double *C, double *D, double *E, double *inv_diag_E)
 	{
 	kernel_dtrsm_nt_rl_inv_4x4_vs_lib4(k, A, B, C, D, E, inv_diag_E, 4, 4);
@@ -4457,7 +5024,7 @@ void kernel_dtrsm_nt_rl_inv_4x4_lib4(int k, double *A, double *B, double *C, dou
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dgemm_dtrsm_nt_rl_inv_4x4_vs_lib4(int kp, double *Ap, double *Bp, int km_, double *Am, double *Bm, double *C, double *D, double *E, double *inv_diag_E, int km, int kn)
 	{
 	double alpha = 1.0;
@@ -4469,7 +5036,7 @@ void kernel_dgemm_dtrsm_nt_rl_inv_4x4_vs_lib4(int kp, double *Ap, double *Bp, in
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dgemm_dtrsm_nt_rl_inv_4x4_lib4(int kp, double *Ap, double *Bp, int km_, double *Am, double *Bm, double *C, double *D, double *E, double *inv_diag_E)
 	{
 	double alpha = 1.0;
@@ -4481,7 +5048,7 @@ void kernel_dgemm_dtrsm_nt_rl_inv_4x4_lib4(int kp, double *Ap, double *Bp, int k
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nt_rl_one_4x4_vs_lib4(int kmax, double *A, double *B, double *C, double *D, double *E, int km, int kn)
 	{
 
@@ -4848,7 +5415,7 @@ void kernel_dtrsm_nt_rl_one_4x4_vs_lib4(int kmax, double *A, double *B, double *
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nt_rl_one_4x4_lib4(int k, double *A, double *B, double *C, double *D, double *E)
 	{
 	kernel_dtrsm_nt_rl_one_4x4_vs_lib4(k, A, B, C, D, E, 4, 4);
@@ -4857,7 +5424,7 @@ void kernel_dtrsm_nt_rl_one_4x4_lib4(int k, double *A, double *B, double *C, dou
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nt_ru_inv_4x4_vs_lib4(int kmax, double *A, double *B, double *C, double *D, double *E, double *inv_diag_E, int km, int kn)
 	{
 
@@ -5246,7 +5813,7 @@ void kernel_dtrsm_nt_ru_inv_4x4_vs_lib4(int kmax, double *A, double *B, double *
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nt_ru_inv_4x4_lib4(int k, double *A, double *B, double *C, double *D, double *E, double *inv_diag_E)
 	{
 	kernel_dtrsm_nt_ru_inv_4x4_vs_lib4(k, A, B, C, D, E, inv_diag_E, 4, 4);
@@ -5255,7 +5822,7 @@ void kernel_dtrsm_nt_ru_inv_4x4_lib4(int k, double *A, double *B, double *C, dou
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dgetrf_nn_4x4_vs_lib4(int kmax, double *A, double *B, int sdb, double *C, double *D, double *inv_diag_D, int km, int kn)
 	{
 
@@ -5634,7 +6201,7 @@ void kernel_dgetrf_nn_4x4_vs_lib4(int kmax, double *A, double *B, int sdb, doubl
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dgetrf_nn_4x4_lib4(int kmax, double *A, double *B, int sdb, double *C, double *D, double *inv_diag_D)
 	{
 	kernel_dgetrf_nn_4x4_vs_lib4(kmax, A, B, sdb, C, D, inv_diag_D, 4, 4);
@@ -5643,7 +6210,7 @@ void kernel_dgetrf_nn_4x4_lib4(int kmax, double *A, double *B, int sdb, double *
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nn_ll_one_4x4_vs_lib4(int kmax, double *A, double *B, int sdb, double *C, double *D, double *E, int km, int kn)
 	{
 
@@ -6010,7 +6577,7 @@ void kernel_dtrsm_nn_ll_one_4x4_vs_lib4(int kmax, double *A, double *B, int sdb,
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nn_ll_one_4x4_lib4(int kmax, double *A, double *B, int sdb, double *C, double *D, double *E)
 	{
 	kernel_dtrsm_nn_ll_one_4x4_vs_lib4(kmax, A, B, sdb, C, D, E, 4, 4);
@@ -6019,7 +6586,7 @@ void kernel_dtrsm_nn_ll_one_4x4_lib4(int kmax, double *A, double *B, int sdb, do
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nn_ru_inv_4x4_vs_lib4(int kmax, double *A, double *B, int sdb, double *C, double *D, double *E, double *inv_diag_E, int km, int kn)
 	{
 
@@ -6410,7 +6977,7 @@ void kernel_dtrsm_nn_ru_inv_4x4_vs_lib4(int kmax, double *A, double *B, int sdb,
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nn_ru_inv_4x4_lib4(int kmax, double *A, double *B, int sdb, double *C, double *D, double *E, double *inv_diag_E)
 	{
 	kernel_dtrsm_nn_ru_inv_4x4_vs_lib4(kmax, A, B, sdb, C, D, E, inv_diag_E, 4, 4);
@@ -6419,7 +6986,7 @@ void kernel_dtrsm_nn_ru_inv_4x4_lib4(int kmax, double *A, double *B, int sdb, do
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nn_lu_inv_4x4_vs_lib4(int kmax, double *A, double *B, int sdb, double *C, double *D, double *E, double *inv_diag_E, int km, int kn)
 	{
 
@@ -6815,7 +7382,7 @@ void kernel_dtrsm_nn_lu_inv_4x4_vs_lib4(int kmax, double *A, double *B, int sdb,
 
 
 
-#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
+#if defined(TARGET_GENERIC) || defined(TARGET_X86_AMD_BARCELONA) || defined(TARGET_X86_AMD_JAGUAR) || defined(TARGET_X64_INTEL_CORE) || defined(TARGET_X64_AMD_BULLDOZER) || defined(TARGET_ARMV7A_ARM_CORTEX_A15) || defined(TARGET_ARMV8A_ARM_CORTEX_A57) || defined(TARGET_ARMV8A_ARM_CORTEX_A53)
 void kernel_dtrsm_nn_lu_inv_4x4_lib4(int kmax, double *A, double *B, int sdb, double *C, double *D, double *E, double *inv_diag_E)
 	{
 	kernel_dtrsm_nn_lu_inv_4x4_vs_lib4(kmax, A, B, sdb, C, D, E, inv_diag_E, 4, 4);

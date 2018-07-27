@@ -35,21 +35,21 @@
 
 // BLASFEO routines
 #include "../include/blasfeo_common.h"
-#include "../include/blasfeo_d_blas.h"
-#include "../include/blasfeo_d_kernel.h"
+#include "../include/blasfeo_s_blas.h"
+#include "../include/blasfeo_s_kernel.h"
 
 // External dependencies
-#include "../include/blasfeo_d_aux_ext_dep.h"
+#include "../include/blasfeo_s_aux_ext_dep.h"
 #include "../include/blasfeo_i_aux_ext_dep.h"
 #include "../include/blasfeo_v_aux_ext_dep.h"
 #include "../include/blasfeo_timing.h"
 
 // BLASFEO LA:REFERENCE routines
-#include "../include/blasfeo_d_blas3_ref.h"
-#include "../include/blasfeo_d_aux_ref.h"
-#include "../include/blasfeo_d_aux_ext_dep_ref.h"
+#include "../include/blasfeo_s_blas3_ref.h"
+#include "../include/blasfeo_s_aux_ref.h"
+#include "../include/blasfeo_s_aux_ext_dep_ref.h"
 
-#include "test_d_common.h"
+#include "test_s_common.h"
 #include "test_x_common.c"
 
 
@@ -60,7 +60,7 @@ int main()
 	int ii, jj, kk, ai, aj, bi, bj, ci, cj, di, dj;
 	int n = 60;
 
-	double test_elapsed_time;
+	float test_elapsed_time;
 
 	blasfeo_timer timer;
 
@@ -69,74 +69,74 @@ int main()
 	/* matrices in column-major format */
 	/* printf("Allocate C matrices\n"); */
 
-	double *A, *B, *C, *D;
+	float *A, *B, *C, *D;
 	// standard column major allocation (malloc)
-	d_zeros(&A, n, n);
-	d_zeros(&B, n, n);
-	d_zeros(&C, n, n);
-	d_zeros(&D, n, n);
+	s_zeros(&A, n, n);
+	s_zeros(&B, n, n);
+	s_zeros(&C, n, n);
+	s_zeros(&D, n, n);
 
 	for(ii=0; ii<n*n; ii++) A[ii] = ii+1;
 	for(ii=0; ii<n*n; ii++) B[ii] = 2*(ii+1);
 	for(ii=0; ii<n*n; ii++) C[ii] = 0.5*(ii+1);
 
-	/* instantiate blasfeo_dmat */
+	/* instantiate blasfeo_smat */
 
 	/* printf("Allocate HP matrices\n"); */
 
-	struct blasfeo_dmat sA; blasfeo_allocate_dmat(n, n, &sA);
-	struct blasfeo_dmat sB; blasfeo_allocate_dmat(n, n, &sB);
-	struct blasfeo_dmat sC; blasfeo_allocate_dmat(n, n, &sC);
-	struct blasfeo_dmat sD; blasfeo_allocate_dmat(n, n, &sD);
+	struct blasfeo_smat sA; blasfeo_allocate_smat(n, n, &sA);
+	struct blasfeo_smat sB; blasfeo_allocate_smat(n, n, &sB);
+	struct blasfeo_smat sC; blasfeo_allocate_smat(n, n, &sC);
+	struct blasfeo_smat sD; blasfeo_allocate_smat(n, n, &sD);
 
-	blasfeo_pack_dmat(n, n, A, n, &sA, 0, 0);
-	blasfeo_pack_dmat(n, n, B, n, &sB, 0, 0);
-	blasfeo_pack_dmat(n, n, C, n, &sC, 0, 0);
-	blasfeo_pack_dmat(n, n, D, n, &sD, 0, 0);
+	blasfeo_pack_smat(n, n, A, n, &sA, 0, 0);
+	blasfeo_pack_smat(n, n, B, n, &sB, 0, 0);
+	blasfeo_pack_smat(n, n, C, n, &sC, 0, 0);
+	blasfeo_pack_smat(n, n, D, n, &sD, 0, 0);
 
 	// batch memory allocation
 	#if 0
 	// compute memory size
-	int size_dmat = 4*blasfeo_memsize_dmat(n, n);
+	int size_smat = 4*blasfeo_memsize_smat(n, n);
 	// initialize void pointer
-	void *memory_dmat;
+	void *memory_smat;
 	// memory allocation
-	v_zeros_align(&memory_dmat, size_dmat);
+	v_zeros_align(&memory_smat, size_smat);
 	// cast memory pointer
-	char *ptr_memory_dmat = (char *) memory_dmat;
-	// instantiate blasfeo_dmat
-	struct blasfeo_dmat sA;
-	blasfeo_create_dmat(n, n, &sA, ptr_memory_dmat);
-	ptr_memory_dmat += sA.memsize;
-	blasfeo_pack_dmat(n, n, A, n, &sA, 0, 0);
+	char *ptr_memory_smat = (char *) memory_smat;
+	// instantiate blasfeo_smat
+	struct blasfeo_smat sA;
+	blasfeo_create_smat(n, n, &sA, ptr_memory_smat);
+	ptr_memory_smat += sA.memsize;
+	blasfeo_pack_smat(n, n, A, n, &sA, 0, 0);
 	#endif
 
 	/* printf("Allocate REF matrices\n"); */
 
-	struct blasfeo_dmat_ref rA; blasfeo_allocate_dmat_ref(n, n, &rA);
-	struct blasfeo_dmat_ref rB; blasfeo_allocate_dmat_ref(n, n, &rB);
-	struct blasfeo_dmat_ref rC; blasfeo_allocate_dmat_ref(n, n, &rC);
-	struct blasfeo_dmat_ref rD; blasfeo_allocate_dmat_ref(n, n, &rD);
+	struct blasfeo_smat_ref rA; blasfeo_allocate_smat_ref(n, n, &rA);
+	struct blasfeo_smat_ref rB; blasfeo_allocate_smat_ref(n, n, &rB);
+	struct blasfeo_smat_ref rC; blasfeo_allocate_smat_ref(n, n, &rC);
+	struct blasfeo_smat_ref rD; blasfeo_allocate_smat_ref(n, n, &rD);
 
 
-	blasfeo_pack_dmat_ref(n, n, A, n, &rA, 0, 0);
-	blasfeo_pack_dmat_ref(n, n, B, n, &rB, 0, 0);
-	blasfeo_pack_dmat_ref(n, n, C, n, &rC, 0, 0);
-	blasfeo_pack_dmat_ref(n, n, D, n, &rD, 0, 0);
+	blasfeo_pack_smat_ref(n, n, A, n, &rA, 0, 0);
+	blasfeo_pack_smat_ref(n, n, B, n, &rB, 0, 0);
+	blasfeo_pack_smat_ref(n, n, C, n, &rC, 0, 0);
+	blasfeo_pack_smat_ref(n, n, D, n, &rD, 0, 0);
 
 	// -------- Print matrices
 	#if 0
-	/* printf("\nPrint dmat HP A:\n\n"); */
-	/* blasfeo_print_dmat(p_n, p_n, &sA, 0, 0); */
+	/* printf("\nPrint smat HP A:\n\n"); */
+	/* blasfeo_print_smat(p_n, p_n, &sA, 0, 0); */
 
-	/* printf("\nPrint dmat REF A:\n\n"); */
-	/* blasfeo_print_dmat_ref(p_n, p_n, &rA, 0, 0); */
+	/* printf("\nPrint smat REF A:\n\n"); */
+	/* blasfeo_print_smat_ref(p_n, p_n, &rA, 0, 0); */
 
-	/* printf("\nPrint dmat HP B:\n\n"); */
-	/* blasfeo_print_dmat(p_n, p_n, &sB, 0, 0); */
+	/* printf("\nPrint smat HP B:\n\n"); */
+	/* blasfeo_print_smat(p_n, p_n, &sB, 0, 0); */
 
-	/* printf("\nPrint dmat REF B:\n\n"); */
-	/* blasfeo_print_dmat_ref(p_n, p_n, &rB, 0, 0); */
+	/* printf("\nPrint smat REF B:\n\n"); */
+	/* blasfeo_print_smat_ref(p_n, p_n, &rB, 0, 0); */
 	#endif
 
 	int ni, nj, nk, total_calls, bad_calls;
@@ -157,8 +157,8 @@ int main()
 	int nk0 = 1;
 
 	#if ROUTINE_CLASS_GEMM
-	int AB_offsets = 2;
-	int ii0s = 13;
+	int AB_offsets = 1;
+	int ii0s = 1;
 	int jj0s = 1;
 	int kk0s = 1;
 	int nis = 25;
@@ -177,8 +177,8 @@ int main()
 	int njs = 17;
 	#endif
 
-	double alpha_l[6] = {1.0, 0.0, 0.0001, 0.02, 400.0, 50000.0};
-	double beta_l[6] = {1.0, 0.0, 0.0001, 0.02, 400.0, 50000.0};
+	float alpha_l[6] = {1.0, 0.0, 0.0001, 0.02, 400.0, 50000.0};
+	float beta_l[6] = {1.0, 0.0, 0.0001, 0.02, 400.0, 50000.0};
 
 	total_calls = alphas*nis*njs*nks*ii0s*jj0s*AB_offsets;
 	bad_calls = 0;
@@ -194,8 +194,8 @@ int main()
 	// loop over alphas/betas
 	for (kk = 0; kk < alphas; kk++)
 		{
-		double alpha = alpha_l[kk];
-		double beta = beta_l[kk];
+		float alpha = alpha_l[kk];
+		float beta = beta_l[kk];
 
 		// try different loop grow order n then m and viceversa
 		//
@@ -237,6 +237,7 @@ int main()
 									di = ii+AB_offset_i;
 									dj = jj;
 
+
 									#ifdef ROUTINE_CLASS_GEMM
 									#if (VERBOSE>1)
 									print_routine_signature(string(ROUTINE),
@@ -258,7 +259,7 @@ int main()
 										&rC, ci, cj,
 										&rD, di, dj);
 
-									int res = dgecmp_libstr(ni, nj, ai, aj, &sD, &rD, &sA, &rA, &err_i, &err_j, VERBOSE);
+									int res = sgecmp_libstr(ni, nj, ai, aj, &sD, &rD, &sA, &rA, &err_i, &err_j, VERBOSE);
 
 									if (!res) bad_calls += 1;
 									#if (VERBOSE==0)
@@ -303,7 +304,7 @@ int main()
 										&rC, ci, cj,
 										&rD, di, dj);
 
-									int res = dgecmp_libstr(ni, nj, ai, aj, &sD, &rD, &sA, &rA, &err_i, &err_j, VERBOSE);
+									int res = sgecmp_libstr(ni, nj, ai, aj, &sD, &rD, &sA, &rA, &err_i, &err_j, VERBOSE);
 
 									if (!res) bad_calls += 1;
 									#if (VERBOSE>0)
@@ -344,7 +345,7 @@ int main()
 										&rB, bi, bj,
 										&rD, di, dj);
 
-									int res = dgecmp_libstr(ni, nj, ai, aj, &sD, &rD, &sA, &rA, &err_i, &err_j, VERBOSE);
+									int res = sgecmp_libstr(ni, nj, ai, aj, &sD, &rD, &sA, &rA, &err_i, &err_j, VERBOSE);
 
 									if (!res) bad_calls += 1;
 
@@ -403,20 +404,20 @@ int main()
 	print_compilation_flags();
 	#endif
 
-	d_free(A);
-	d_free(B);
-	d_free(C);
-	d_free(D);
+	s_free(A);
+	s_free(B);
+	s_free(C);
+	s_free(D);
 
-	blasfeo_free_dmat(&sB);
-	blasfeo_free_dmat(&sA);
-	blasfeo_free_dmat(&sC);
-	blasfeo_free_dmat(&sD);
+	blasfeo_free_smat(&sB);
+	blasfeo_free_smat(&sA);
+	blasfeo_free_smat(&sC);
+	blasfeo_free_smat(&sD);
 
-	blasfeo_free_dmat_ref(&rA);
-	blasfeo_free_dmat_ref(&rB);
-	blasfeo_free_dmat_ref(&rC);
-	blasfeo_free_dmat_ref(&rD);
+	blasfeo_free_smat_ref(&rA);
+	blasfeo_free_smat_ref(&rB);
+	blasfeo_free_smat_ref(&rC);
+	blasfeo_free_smat_ref(&rD);
 
 	return 0;
 
@@ -434,3 +435,4 @@ int main()
 
 
 #endif
+

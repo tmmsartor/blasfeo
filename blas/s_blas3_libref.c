@@ -7,18 +7,18 @@
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
+* BLASFEO is free software; you can redistribute it and/or                                        *
 * modify it under the terms of the GNU Lesser General Public                                      *
 * License as published by the Free Software Foundation; either                                    *
 * version 2.1 of the License, or (at your option) any later version.                              *
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* BLASFEO is distributed in the hope that it will be useful,                                      *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
 * See the GNU Lesser General Public License for more details.                                     *
 *                                                                                                 *
 * You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
+* License along with BLASFEO; if not, write to the Free Software                                  *
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
 *                                                                                                 *
 * Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
@@ -27,9 +27,9 @@
 **************************************************************************************************/
 
 /*
- * auxiliary functions for LA:REFERENCE (column major)
+ * blas3 functions for LA:REFERENCE (column major)
  *
- * auxiliary/d_aux_lib*.c
+ * blas/s_blas_lib*.c
  *
  */
 
@@ -38,38 +38,34 @@
 #include <math.h>
 
 #include "../include/blasfeo_common.h"
+#include "../include/blasfeo_s_aux.h"
+#include "../include/blasfeo_s_aux.h"
 
 
-#define REAL double
-#define STRMAT blasfeo_dmat_ref
-#define STRVEC blasfeo_dvec_ref
+#define REAL float 
+#define STRMAT blasfeo_smat_ref
+#define STRVEC blasfeo_svec_ref
 
+#define GEMM_NN_LIBSTR    blasfeo_sgemm_nn_ref
+#define GEMM_NT_LIBSTR    blasfeo_sgemm_nt_ref
 
+#define SYRK_LN_LIBSTR    blasfeo_ssyrk_ln_ref
+#define SYRK_LN_MN_LIBSTR blasfeo_ssyrk_ln_mn_ref
 
+#define TRSM_LLNU_LIBSTR  blasfeo_strsm_llnu_ref
+#define TRSM_LUNN_LIBSTR  blasfeo_strsm_lunn_ref
+#define TRSM_RLTU_LIBSTR  blasfeo_strsm_rltu_ref
+#define TRSM_RLTN_LIBSTR  blasfeo_strsm_rltn_ref
+#define TRSM_RUTN_LIBSTR  blasfeo_strsm_rutn_ref
+#define TRMM_RUTN_LIBSTR  blasfeo_strmm_rutn_ref
+#define TRMM_RLNN_LIBSTR  blasfeo_strmm_rlnn_ref
 
-#define SIZE_STRMAT blasfeo_memsize_dmat_ref
-#define SIZE_DIAG_STRMAT blasfeo_memsize_diag_dmat_ref
-#define SIZE_STRVEC blasfeo_memsize_dvec_ref
-
-#define CREATE_STRMAT blasfeo_create_dmat_ref
-#define CREATE_STRVEC blasfeo_create_dvec_ref
-
-#define CVT_MAT2STRMAT blasfeo_pack_dmat_ref
-#define CVT_TRAN_MAT2STRMAT blasfeo_pack_tran_dmat_ref
-#define CVT_VEC2STRVEC blasfeo_pack_dvec_ref
-#define CVT_STRMAT2MAT blasfeo_unpack_dmat_ref
-#define CVT_TRAN_STRMAT2MAT blasfeo_unpack_tran_dmat_ref
-#define CVT_STRVEC2VEC blasfeo_unpack_dvec_ref
-#define CAST_MAT2STRMAT blasfeo_d_cast_mat2strmat_ref
-#define CAST_DIAG_MAT2STRMAT blasfeo_d_cast_diag_mat2strmat_ref
-#define CAST_VEC2VECMAT blasfeo_d_cast_vec2vecmat_ref
-
-#define GEAD_LIBSTR blasfeo_dgead_ref
-#define GECP_LIBSTR blasfeo_dgecp_ref
-#define GESC_LIBSTR blasfeo_dgesc_ref
-#define GECPSC_LIBSTR blasfeo_dgecpsc_ref
-
+#define COPY scopy_
+#define GEMM sgemm_
+#define SYRK ssyrk_
+#define TRMM strmm_
+#define TRSM strsm_
 
 
 // TESTING_MODE
-#include "x_aux_lib.c"
+#include "x_blas3_lib.c"
