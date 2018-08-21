@@ -1,21 +1,26 @@
-dist: trusty
+dist: trusty 
 sudo: required
 group: edge
 language: python
 python:
   - 3.6
 
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+
 env:
 - CC="gcc-4.8" SHARED="ON"
-- CC="gcc-4.8" SHARED="OFF"
+- CC="gcc-6" SHARED="ON"
 
 install:
   - sudo apt-get update -yqq
-  - sudo apt-get install -yqq $CC
+  - sudo apt-get --allow-unauthenticated install -yqq $CC
 
 script:
   - cmake -E make_directory build
-  - cmake -E chdir build cmake -DBUILD_SHARED_LIBS=$SHARED -DCMAKE_BUILD_TYPE=Release ..
+  - cmake -E chdir build cmake -DBUILD_SHARED_LIBS=$SHARED -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_BUILD_TYPE=Release ..
   - cmake --build build
 
 deploy:
