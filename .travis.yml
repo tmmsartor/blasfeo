@@ -3,10 +3,7 @@ sudo: required
 group: edge
 
 env:
-  - CXX="g++-6" CC="gcc-6"
-# - CXX="g++-5" CC="gcc-5"
-# - CXX="g++-4.9" CC="gcc-4.9"
-# - CXX="clang++-3.7" CC="clang-3.7"
+- CC="gcc-4.8" COVERAGE="lcov"
 
 install:
   - sudo apt-get update -yqq
