@@ -1,10 +1,13 @@
 dist: trusty
 sudo: required
 group: edge
+language: python
+python:
+  - 3.6
 
 env:
-- CC="gcc-4.8" COVERAGE="lcov" SHARED="ON"
-- CC="gcc-4.8" COVERAGE="lcov" SHARED="OFF"
+- CC="gcc-4.8" SHARED="ON"
+- CC="gcc-4.8" SHARED="OFF"
 
 install:
   - sudo apt-get update -yqq
@@ -12,16 +15,8 @@ install:
 
 script:
   - cmake -E make_directory build
-  - cmake -E chdir build cmake -DCOVERAGE=$COVERAGE -DBUILD_SHARED_LIBS=$SHARED -DCMAKE_BUILD_TYPE=Release ..
+  - cmake -E chdir build cmake -DBUILD_SHARED_LIBS=$SHARED -DCMAKE_BUILD_TYPE=Release ..
   - cmake --build build
 
 deploy:
   skip_cleanup: true
-
-after_success:
-  - pushd build
-  # Upload report to CodeCov
-  - |
-    if [ "$COVERAGE" == "lcov" ]; then
-      bash <(curl -s https://codecov.io/bash); else echo "Codecov did not collect coverage reports"
-    fi
