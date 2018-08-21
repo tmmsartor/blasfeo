@@ -3,7 +3,8 @@ sudo: required
 group: edge
 
 env:
-- CC="gcc-4.8" COVERAGE="lcov"
+- CC="gcc-4.8" COVERAGE="lcov" SHARED="ON"
+- CC="gcc-4.8" COVERAGE="lcov" SHARED="OFF"
 
 install:
   - sudo apt-get update -yqq
@@ -11,7 +12,7 @@ install:
 
 script:
   - cmake -E make_directory build
-  - cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release ..
+  - cmake -E chdir build cmake -DCOVERAGE=$COVERAGE -DBUILD_SHARED_LIBS=$SHARED -DCMAKE_BUILD_TYPE=Release ..
   - cmake --build build
 
 deploy:
