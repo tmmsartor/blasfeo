@@ -11,7 +11,7 @@ addons:
     - ubuntu-toolchain-r-test
 
 env:
-- CC="gcc-4.8" SHARED="ON"
+- CC="gcc-6" SHARED="OFF"
 - CC="gcc-6" SHARED="ON"
 
 install:
