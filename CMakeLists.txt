@@ -94,6 +94,9 @@ configure_file(${PROJECT_SOURCE_DIR}/blasfeo_target.h.in
 # build shared library
 #set(BUILD_SHARED_LIBS ON CACHE STRING "Build shared libraries")
 
+# Common Optimization Flags
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -02 -fPIC")
+
 # installation directory
 if(CMAKE_INSTALL_PREFIX MATCHES "/usr/local")
 	set(CMAKE_INSTALL_PREFIX "/opt/blasfeo")

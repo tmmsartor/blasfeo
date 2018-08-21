@@ -145,7 +145,6 @@ ASFLAGS =
 LDFLAGS =
 
 # Common optimization flags
-#
 CFLAGS += -O2 -fPIC
 
 # Debugging flags
