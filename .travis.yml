@@ -6,21 +6,10 @@ python:
   - 3.5
 
 env:
-  - CXX="g++-6" CC="gcc-6" SWIG_PYTHON=ON SWIG_MATLAB=OFF # no MATLAB support for gcc>=5
-  - CXX="g++-5" CC="gcc-5" SWIG_PYTHON=ON SWIG_MATLAB=OFF
-  - CXX="g++-4.9" CC="gcc-4.9" SWIG_PYTHON=ON SWIG_MATLAB=ON COVERAGE="lcov"
-  - CXX="clang++-3.7" CC="clang-3.7" SWIG_PYTHON=ON SWIG_MATLAB=OFF
-
-addons:
-  apt:
-    sources:
-    - llvm-toolchain-precise-3.7
-    - ubuntu-toolchain-r-test
-
-cache:
-  directories:
-    - /home/travis/external_software/
-    - /home/travis/octave_download/
+  - CXX="g++-6" CC="gcc-6"
+  - CXX="g++-5" CC="gcc-5"
+  - CXX="g++-4.9" CC="gcc-4.9"
+  - CXX="clang++-3.7" CC="clang-3.7"
 
 script:
   - cmake -E make_directory build
@@ -28,15 +17,13 @@ script:
   - cmake --build build
 
 deploy:
-  provider: releases
-  api_key: "${GITHUB_OAUTH_TOKEN}"
-  file: "${RELEASES_PREFIX}/blasfeo.tar.gz"
   skip_cleanup: true
-  on:
-    tags: true
 
 
 after_success:
   - pushd build
   # Upload report to CodeCov
-- if [ "$COVERAGE" == "lcov" ]; then bash <(curl -s https://codecov.io/bash); else echo "Codecov did not collect coverage reports"; fi
+  - |
+    if [ "$COVERAGE" == "lcov" ]; then
+      bash <(curl -s https://codecov.io/bash); else echo "Codecov did not collect coverage reports"
+    fi
