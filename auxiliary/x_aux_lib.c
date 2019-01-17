@@ -3,32 +3,33 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
 
 // return memory size (in bytes) needed for a strmat
-int SIZE_STRMAT(int m, int n)
+int MEMSIZE_MAT(int m, int n)
 	{
 	int tmp = m<n ? m : n; // al(min(m,n)) // XXX max ???
 	int size = (m*n+tmp)*sizeof(REAL);
@@ -38,7 +39,7 @@ int SIZE_STRMAT(int m, int n)
 
 
 // return memory size (in bytes) needed for the diagonal of a strmat
-int SIZE_DIAG_STRMAT(int m, int n)
+int MEMSIZE_DIAG_MAT(int m, int n)
 	{
 	int size = 0;
 	int tmp = m<n ? m : n; // al(min(m,n)) // XXX max ???
@@ -49,7 +50,7 @@ int SIZE_DIAG_STRMAT(int m, int n)
 
 
 // return memory size (in bytes) needed for a strvec
-int SIZE_STRVEC(int m)
+int MEMSIZE_VEC(int m)
 	{
 	int size = m*sizeof(REAL);
 	return size;
@@ -58,7 +59,7 @@ int SIZE_STRVEC(int m)
 
 
 // create a matrix structure for a matrix of size m*n by using memory passed by a pointer
-void CREATE_STRMAT(int m, int n, struct STRMAT *sA, void *memory)
+void CREATE_MAT(int m, int n, struct MAT *sA, void *memory)
 	{
 	sA->m = m;
 	sA->n = n;
@@ -76,7 +77,7 @@ void CREATE_STRMAT(int m, int n, struct STRMAT *sA, void *memory)
 
 
 // create a matrix structure for a matrix of size m*n by using memory passed by a pointer
-void CREATE_STRVEC(int m, struct STRVEC *sa, void *memory)
+void CREATE_VEC(int m, struct VEC *sa, void *memory)
 	{
 	sa->m = m;
 	REAL *ptr = (REAL *) memory;
@@ -89,7 +90,7 @@ void CREATE_STRVEC(int m, struct STRVEC *sa, void *memory)
 
 
 // convert a matrix into a matrix structure
-void CVT_MAT2STRMAT(int m, int n, REAL *A, int lda, struct STRMAT *sA, int ai, int aj)
+void PACK_MAT(int m, int n, REAL *A, int lda, struct MAT *sA, int ai, int aj)
 	{
 	// invalidate stored inverse diagonal
 	sA->use_dA = 0;
@@ -118,7 +119,7 @@ void CVT_MAT2STRMAT(int m, int n, REAL *A, int lda, struct STRMAT *sA, int ai, i
 
 
 // convert and transpose a matrix into a matrix structure
-void CVT_TRAN_MAT2STRMAT(int m, int n, REAL *A, int lda, struct STRMAT *sA, int ai, int aj)
+void PACK_TRAN_MAT(int m, int n, REAL *A, int lda, struct MAT *sA, int ai, int aj)
 	{
 	// invalidate stored inverse diagonal
 	sA->use_dA = 0;
@@ -147,7 +148,7 @@ void CVT_TRAN_MAT2STRMAT(int m, int n, REAL *A, int lda, struct STRMAT *sA, int 
 
 
 // convert a vector into a vector structure
-void CVT_VEC2STRVEC(int m, REAL *a, struct STRVEC *sa, int ai)
+void PACK_VEC(int m, REAL *a, struct VEC *sa, int ai)
 	{
 	REAL *pa = sa->pa + ai;
 	int ii;
@@ -159,7 +160,7 @@ void CVT_VEC2STRVEC(int m, REAL *a, struct STRVEC *sa, int ai)
 
 
 // convert a matrix structure into a matrix
-void CVT_STRMAT2MAT(int m, int n, struct STRMAT *sA, int ai, int aj, REAL *A, int lda)
+void UNPACK_MAT(int m, int n, struct MAT *sA, int ai, int aj, REAL *A, int lda)
 	{
 	int ii, jj;
 	int lda2 = sA->m;
@@ -185,7 +186,7 @@ void CVT_STRMAT2MAT(int m, int n, struct STRMAT *sA, int ai, int aj, REAL *A, in
 
 
 // convert and transpose a matrix structure into a matrix
-void CVT_TRAN_STRMAT2MAT(int m, int n, struct STRMAT *sA, int ai, int aj, REAL *A, int lda)
+void UNPACK_TRAN_MAT(int m, int n, struct MAT *sA, int ai, int aj, REAL *A, int lda)
 	{
 	int ii, jj;
 	int lda2 = sA->m;
@@ -211,7 +212,7 @@ void CVT_TRAN_STRMAT2MAT(int m, int n, struct STRMAT *sA, int ai, int aj, REAL *
 
 
 // convert a vector structure into a vector
-void CVT_STRVEC2VEC(int m, struct STRVEC *sa, int ai, REAL *a)
+void UNPACK_VEC(int m, struct VEC *sa, int ai, REAL *a)
 	{
 	REAL *pa = sa->pa + ai;
 	int ii;
@@ -223,7 +224,7 @@ void CVT_STRVEC2VEC(int m, struct STRVEC *sa, int ai, REAL *a)
 
 
 // cast a matrix into a matrix structure
-void CAST_MAT2STRMAT(REAL *A, struct STRMAT *sA)
+void CAST_MAT2STRMAT(REAL *A, struct MAT *sA)
 	{
 	// invalidate stored inverse diagonal
 	sA->use_dA = 0;
@@ -235,7 +236,7 @@ void CAST_MAT2STRMAT(REAL *A, struct STRMAT *sA)
 
 
 // cast a matrix into the diagonal of a matrix structure
-void CAST_DIAG_MAT2STRMAT(REAL *dA, struct STRMAT *sA)
+void CAST_DIAG_MAT2STRMAT(REAL *dA, struct MAT *sA)
 	{
 	// invalidate stored inverse diagonal
 	sA->use_dA = 0;
@@ -247,7 +248,7 @@ void CAST_DIAG_MAT2STRMAT(REAL *dA, struct STRMAT *sA)
 
 
 // cast a vector into a vector structure
-void CAST_VEC2VECMAT(REAL *a, struct STRVEC *sa)
+void CAST_VEC2VECMAT(REAL *a, struct VEC *sa)
 	{
 	sa->pa = a;
 	return;
@@ -256,7 +257,7 @@ void CAST_VEC2VECMAT(REAL *a, struct STRVEC *sa)
 
 
 // copy a generic strmat into a generic strmat
-void GECP_LIBSTR(int m, int n, struct STRMAT *sA, int ai, int aj, struct STRMAT *sC, int ci, int cj)
+void GECP_LIBSTR(int m, int n, struct MAT *sA, int ai, int aj, struct MAT *sC, int ci, int cj)
 	{
 	// invalidate stored inverse diagonal
 	sC->use_dA = 0;
@@ -287,7 +288,7 @@ void GECP_LIBSTR(int m, int n, struct STRMAT *sA, int ai, int aj, struct STRMAT 
 
 
 // scale a generic strmat
-void GESC_LIBSTR(int m, int n, REAL alpha, struct STRMAT *sA, int ai, int aj)
+void GESC_LIBSTR(int m, int n, REAL alpha, struct MAT *sA, int ai, int aj)
 	{
 	// invalidate stored inverse diagonal
 	sA->use_dA = 0;
@@ -316,7 +317,7 @@ void GESC_LIBSTR(int m, int n, REAL alpha, struct STRMAT *sA, int ai, int aj)
 
 
 // scale an generic strmat and copy into generic strmat
-void GECPSC_LIBSTR(int m, int n, REAL alpha, struct STRMAT *sA, int ai, int aj, struct STRMAT *sB, int bi, int bj)
+void GECPSC_LIBSTR(int m, int n, REAL alpha, struct MAT *sA, int ai, int aj, struct MAT *sB, int bi, int bj)
 	{
 	// invalidate stored inverse diagonal
 	sB->use_dA = 0;
@@ -349,7 +350,7 @@ void GECPSC_LIBSTR(int m, int n, REAL alpha, struct STRMAT *sA, int ai, int aj, 
 
 
 // scale and add a generic strmat into a generic strmat
-void GEAD_LIBSTR(int m, int n, REAL alpha, struct STRMAT *sA, int ai, int aj, struct STRMAT *sC, int ci, int cj)
+void GEAD_LIBSTR(int m, int n, REAL alpha, struct MAT *sA, int ai, int aj, struct MAT *sC, int ci, int cj)
 	{
 	// invalidate stored inverse diagonal
 	sC->use_dA = 0;
@@ -372,6 +373,26 @@ void GEAD_LIBSTR(int m, int n, REAL alpha, struct STRMAT *sA, int ai, int aj, st
 		for(; ii<m; ii++)
 			{
 			pC[ii+0+jj*ldc] += alpha*pA[ii+0+jj*lda];
+			}
+		}
+	return;
+	}
+
+
+// set all elements of a strmat to a value
+void GESE_LIBSTR(int m, int n, REAL alpha, struct MAT *sA, int ai, int aj)
+	{
+	// invalidate stored inverse diagonal
+	sA->use_dA = 0;
+
+	int lda = sA->m;
+	REAL *pA = sA->pA + ai + aj*lda;
+	int ii, jj;
+	for(jj=0; jj<n; jj++)
+		{
+		for(ii=0; ii<m; ii++)
+			{
+			pA[ii+lda*jj] = alpha;
 			}
 		}
 	return;

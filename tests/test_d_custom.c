@@ -3,26 +3,27 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
@@ -47,7 +48,7 @@ int main()
 
 	int ii;
 
-	int n = 12;
+	int n = 8;
 
 	//
 	// matrices in column-major format
@@ -206,18 +207,25 @@ int main()
 
 
 #if 0
-	// potrf
-	alpha = 1.0;
-	beta = 1.0;
-	blasfeo_print_dmat(n, n, &sD, 0, 0);
-	blasfeo_dgemm_nt(n, n, n, alpha, &sA, 0, 0, &sA, 0, 0, beta, &sB, 0, 0, &sD, 0, 0);
-	blasfeo_print_dmat(n, n, &sD, 0, 0);
-	blasfeo_dpotrf_l(n, &sD, 0, 0, &sD, 0, 0);
-	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	double *ptr = sA.pA+1;
+	printf("\n%f %p\n", *ptr, ptr);
+	blasfeo_align_64_byte(ptr, (void **) &ptr);
+	printf("\n%f %p\n", *ptr, ptr);
 	return 0;
 #endif
 
-
+#if 0
+	// panel copy
+//	kernel_dpacp_nn_4_lib4(6, 3, sA.pA, sA.cn, sD.pA);
+//	kernel_dpacp_nn_4_vs_lib4(6, 3, sA.pA, sA.cn, sD.pA, 1);
+//	kernel_dpacp_nn_8_lib4(6, 3, sA.pA, sA.cn, sD.pA, sD.cn);
+//	kernel_dpacp_nn_8_vs_lib4(6, 3, sA.pA, sA.cn, sD.pA, sD.cn, 7);
+//	kernel_dpacp_nn_12_lib4(6, 3, sA.pA, sA.cn, sD.pA, sD.cn);
+	kernel_dpacp_nn_12_vs_lib4(6, 3, sA.pA, sA.cn, sD.pA, sD.cn, 11);
+	blasfeo_print_dmat(12, n, &sD, 0, 0);
+	return 0;
+	
+#endif
 
 #if 0
 	// gemm_nt
@@ -225,19 +233,21 @@ int main()
 	beta = 0.0;
 	blasfeo_print_dmat(n, n, &sD, 0, 0);
 
-	kernel_dgemm_nt_4x4_lib4(4, &alpha, sA.pA, sB.pA, &beta, sA.pA, sD.pA);
+//	kernel_dgemm_nt_4x2_lib4(4, &alpha, sA.pA, sB.pA, &beta, sA.pA, sD.pA);
+//	kernel_dgemm_nt_4x4_lib4(4, &alpha, sA.pA, sB.pA, &beta, sA.pA, sD.pA);
 //	kernel_dgemm_nt_4x4_lib4(4, &alpha, sA.pA, sB.pA+1*4*sB.cn, &beta, sD.pA+1*4*4, sD.pA+1*4*4);
 //	kernel_dgemm_nt_4x4_vs_lib4(4, &alpha, sA.pA, sB.pA, &beta, sD.pA, sD.pA, 4, 4);
 
 //	kernel_dgemm_nt_8x4_lib4(n, &alpha, sA.pA, sA.cn, sB.pA, &beta, sD.pA, sD.cn, sD.pA, sD.cn);
 
-//	kernel_dgemm_nt_12x4_lib4(8, &alpha, sA.pA, sA.cn, sB.pA, &beta, sD.pA, sD.cn, sD.pA, sD.cn);
+//	kernel_dgemm_nt_12x4_lib4(n, &alpha, sA.pA, sA.cn, sB.pA, &beta, sD.pA, sD.cn, sD.pA, sD.cn);
+//	kernel_dgemm_nt_12x4_gen_lib4(n, &alpha, sA.pA, sA.cn, sB.pA, &beta, 0, sA.pA, sD.cn, 3, sD.pA, sD.cn, 0, 12, 0, 4);
+
+	blasfeo_dgemm_nt(8, 8, n, alpha, &sA, 0, 0, &sB, 0, 0, beta, &sD, 0, 0, &sD, 0, 0);
 
 	blasfeo_print_dmat(n, n, &sD, 0, 0);
 	return 0;
 #endif
-
-
 
 #if 0
 	// gemm_nn
@@ -247,8 +257,148 @@ int main()
 
 //	kernel_dgemm_nn_4x4_lib4(4, &alpha, sB.pA, 0, sA.pA, sA.cn, &beta, sA.pA, sD.pA);
 
-	blasfeo_dgemm_nn(n, n, n, alpha, &sA, 0, 0, &sB, 0, 0, beta, &sD, 0, 0, &sD, 0, 0);
+	blasfeo_dgemm_nn(8, 4, n, alpha, &sA, 1, 0, &sB, 0, 0, beta, &sD, 0, 0, &sD, 0, 0);
 
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+#if 0
+	// gemm_tn
+	alpha = 1.0;
+	beta = 0.0;
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+
+	blasfeo_dgemm_tn(8, 8, n, alpha, &sA, 0, 0, &sB, 0, 0, beta, &sD, 0, 0, &sD, 1, 0);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+#if 0
+	// gemm_tt
+	alpha = 1.0;
+	beta = 0.0;
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+
+	blasfeo_dgemm_tt(8, 8, n, alpha, &sA, 0, 0, &sB, 0, 0, beta, &sD, 0, 0, &sD, 1, 0);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+#if 0
+	// syrk_ln
+	alpha = 1.0;
+	beta = 0.0;
+//	blasfeo_print_dmat(n, n, &sD, 0, 0);
+
+//	kernel_dsyrk_nt_l_4x4_lib4(4, &alpha, sA.pA, sB.pA, &beta, sA.pA, sD.pA);
+//	kernel_dsyrk_nt_l_4x4_vs_lib4(4, &alpha, sA.pA, sB.pA, &beta, sA.pA, sD.pA, 3, 4);
+//	kernel_dsyrk_nt_l_4x4_gen_lib4(4, &alpha, sA.pA, sB.pA, &beta, 0, sA.pA, sA.cn, 3, sD.pA, sD.cn, 3, 4, 0, 4);
+//	kernel_dsyrk_nt_l_8x4_gen_lib4(4, &alpha, sA.pA, sA.cn, sB.pA, &beta, 0, sA.pA, sA.cn, 1, sD.pA, sD.cn, 0, 5, 0, 4);
+
+	blasfeo_dsyrk_ln(5, 12, alpha, &sB, 0, 0, &sA, 1, 0, beta, &sD, 1, 0, &sD, 1, 0);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+#if 0
+	// syrk_lt
+	alpha = 1.0;
+	beta = 0.0;
+//	blasfeo_print_dmat(n, n, &sD, 0, 0);
+
+	blasfeo_dsyrk_lt(12, 12, alpha, &sA, 0, 0, &sB, 0, 0, beta, &sD, 0, 0, &sD, 0, 0);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+#if 0
+	// syrk_un
+	alpha = 1.0;
+	beta = 0.0;
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+
+//	kernel_dsyrk_nt_u_4x4_lib4(4, &alpha, sA.pA, sB.pA, &beta, sA.pA, sD.pA);
+//	kernel_dsyrk_nt_u_4x4_vs_lib4(4, &alpha, sA.pA, sB.pA, &beta, sA.pA, sD.pA, 3, 4);
+//	kernel_dsyrk_nt_u_4x4_gen_lib4(4, &alpha, sA.pA, sB.pA, &beta, 0, sA.pA, sA.cn, 0, sD.pA, sD.cn, 1, 4, 1, 3);
+
+	blasfeo_dsyrk_un(11, 11, alpha, &sA, 0, 0, &sB, 0, 0, beta, &sD, 0, 0, &sD, 0, 0);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+#if 0
+	// syrk_ut
+	alpha = 1.0;
+	beta = 0.0;
+//	blasfeo_print_dmat(n, n, &sD, 0, 0);
+
+	blasfeo_dsyrk_ut(11, 11, alpha, &sB, 0, 0, &sA, 1, 0, beta, &sD, 0, 0, &sD, 0, 0);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+#if 0
+	// trmm_rutn
+	alpha = -1.0;
+	beta = 0.0;
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+
+//	kernel_dgemm_nn_4x4_lib4(8, &alpha, sA.pA+4*sA.cn, 0, sB.pA, sB.cn, &beta, sA.pA, sD.pA);
+
+	blasfeo_dtrmm_rutn(n, n, alpha, &sA, 0, 0, &sB, 0, 0, &sD, 0, 0);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+#if 0
+	// trmm_rlnn
+	alpha = 1.0;
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+
+	blasfeo_dtrmm_rlnn(9, n, alpha, &sA, 3, 0, &sB, 0, 0, &sD, 0, 0);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+#if 0
+	// trsm_llnn
+	alpha = 2.0;
+	beta = 1.0;
+
+	blasfeo_dsyrk_ln(n, n, alpha, &sA, 0, 0, &sA, 0, 0, beta, &sB, 0, 0, &sC, 0, 0);
+	blasfeo_dpotrf_l(n, &sC, 0, 0, &sC, 0, 0);
+
+	blasfeo_print_dmat(n, n, &sC, 0, 0);
+
+	blasfeo_dtrsm_llnn(15, 15, alpha, &sC, 0, 0, &sB, 0, 0, &sD, 0, 0);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	return 0;
+#endif
+
+#if 0
+	// potrf
+	alpha = 1.0;
+	beta = 1.0;
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
+//	blasfeo_dgemm_nt(n, n, n, alpha, &sA, 0, 0, &sA, 0, 0, beta, &sB, 0, 0, &sD, 0, 0);
+	blasfeo_dsyrk_ln(n, n, alpha, &sA, 0, 0, &sA, 0, 0, beta, &sB, 0, 0, &sD, 0, 0);
+//	blasfeo_dsyrk_ln_mn(n, n-1, n, alpha, &sA, 0, 0, &sA, 0, 0, beta, &sB, 0, 0, &sD, 0, 0);
+//	blasfeo_print_dmat(n, n, &sD, 0, 0);
+	blasfeo_dpotrf_l(n, &sD, 0, 0, &sD, 0, 0);
+//	blasfeo_dtrsm_rltn(7, 4, 1.0, &sD, 0, 0, &sD, 4, 0, &sD, 4, 0);
+//	blasfeo_dpotrf_l_mn(n, 7, &sD, 0, 0, &sD, 0, 0);
+//	blasfeo_dsyrk_dpotrf_ln(n, n, &sA, 0, 0, &sA, 0, 0, &sB, 0, 0, &sD, 0, 0);
+//	blasfeo_dsyrk_dpotrf_ln_mn(n-1, n-3, n, &sA, 0, 0, &sA, 0, 0, &sB, 0, 0, &sD, 0, 0);
 	blasfeo_print_dmat(n, n, &sD, 0, 0);
 	return 0;
 #endif
@@ -256,16 +406,43 @@ int main()
 #if 0
 	// gemv_n
 	blasfeo_print_tran_dvec(n, &sz_n, 0);
-	blasfeo_dgemv_n(3, 3, 1.0, &sA, 0, 0, &sx_n, 0, 0.0, &sy_n, 0, &sz_n, 0);
+	blasfeo_dgemv_n(n, n, 1.0, &sA, 0, 0, &sx_n, 0, 0.0, &sy_n, 0, &sz_n, 0);
+	blasfeo_print_tran_dvec(n, &sz_n, 0);
+	return 0;
+#endif
+
+#if 0
+	// gemv_t
+	blasfeo_print_tran_dvec(n, &sz_n, 0);
+	blasfeo_dgemv_t(n, n, 1.0, &sA, 0, 0, &sx_n, 0, 0.0, &sy_n, 0, &sz_n, 0);
+	blasfeo_print_tran_dvec(n, &sz_n, 0);
+	return 0;
+#endif
+
+#if 0
+	// trsv_ltn
+	blasfeo_print_tran_dvec(n, &sz_n, 0);
+	blasfeo_dtrsv_ltn(n, &sA, 0, 1, &sx_n, 0, &sz_n, 0);
+	blasfeo_print_tran_dvec(n, &sz_n, 0);
+	return 0;
+#endif
+
+#if 0
+	// symv_l
+	blasfeo_print_tran_dvec(n, &sx_n, 0);
+	blasfeo_dsymv_l(5, 5, 1.0, &sA, 1, 1, &sx_n, 0, 0.0, &sy_n, 0, &sz_n, 0);
 	blasfeo_print_tran_dvec(n, &sz_n, 0);
 	return 0;
 #endif
 
 #if 1
-	// gemv_t
-	blasfeo_print_tran_dvec(n, &sz_n, 0);
-	blasfeo_dgemv_t(n, n, 1.0, &sA, 0, 0, &sx_n, 0, 0.0, &sy_n, 0, &sz_n, 0);
-	blasfeo_print_tran_dvec(n, &sz_n, 0);
+	// getrf
+	blasfeo_dgemm_nt(n, n, n, 1.0, &sA, 0, 0, &sA, 0, 0, 1.0, &sB, 0, 0, &sD, 0, 0);
+
+	blasfeo_dgetrf_np(n, n, &sD, 0, 0, &sD, 0, 0);
+//	blasfeo_dgetrf_rp(n, n, &sD, 0, 0, &sD, 0, 0, ipiv);
+
+	blasfeo_print_dmat(n, n, &sD, 0, 0);
 	return 0;
 #endif
 

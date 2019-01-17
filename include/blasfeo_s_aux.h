@@ -3,36 +3,39 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
 #ifndef BLASFEO_S_AUX_H_
 #define BLASFEO_S_AUX_H_
 
-#include <stdio.h>
+
 
 #include "blasfeo_s_aux_old.h"
 #include "blasfeo_common.h"
+
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,37 +66,20 @@ void s_cast_mat2strmat(float *A, struct blasfeo_smat *sA);
 void s_cast_diag_mat2strmat(float *dA, struct blasfeo_smat *sA);
 void s_cast_vec2vecmat(float *a, struct blasfeo_svec *sa);
 
-void blasfeo_sgein1(float a, struct blasfeo_smat *sA, int ai, int aj);
-float blasfeo_sgeex1(struct blasfeo_smat *sA, int ai, int aj);
-void blasfeo_svecin1(float a, struct blasfeo_svec *sx, int xi);
-float blasfeo_svecex1(struct blasfeo_svec *sx, int xi);
-
-// A <= alpha
+// ge
 void blasfeo_sgese(int m, int n, float alpha, struct blasfeo_smat *sA, int ai, int aj);
-// a <= alpha
-void blasfeo_svecse(int m, float alpha, struct blasfeo_svec *sx, int xi);
-
-// copy and scale
-// void sgecp_lib(int m, int n, int offsetA, float *A, int sda, int offsetB, float *B, int sdb);
-//
 void blasfeo_sgecpsc(int m, int n, float alpha, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj);
 void blasfeo_sgecp(int m, int n, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj);
 void blasfeo_sgesc(int m, int n, float alpha, struct blasfeo_smat *sA, int ai, int aj);
-
-void blasfeo_sveccp(int m, struct blasfeo_svec *sa, int ai, struct blasfeo_svec *sc, int ci);
-void blasfeo_svecsc(int m, float alpha, struct blasfeo_svec *sa, int ai);
-void blasfeo_sveccpsc(int m, float alpha, struct blasfeo_svec *sa, int ai, struct blasfeo_svec *sc, int ci);
-
-void blasfeo_strcp_l(int m, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj);
-
+void blasfeo_sgein1(float a, struct blasfeo_smat *sA, int ai, int aj);
+float blasfeo_sgeex1(struct blasfeo_smat *sA, int ai, int aj);
 void blasfeo_sgead(int m, int n, float alpha, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj);
-void blasfeo_svecad(int m, float alpha, struct blasfeo_svec *sa, int ai, struct blasfeo_svec *sc, int ci);
-
 void blasfeo_sgetr(int m, int n, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj);
-
+// tr
+void blasfeo_strcp_l(int m, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj);
 void blasfeo_strtr_l(int m, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj);
 void blasfeo_strtr_u(int m, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj);
-
+// dia
 void blasfeo_sdiare(int kmax, float alpha, struct blasfeo_smat *sA, int ai, int aj);
 void blasfeo_sdiaex(int kmax, float alpha, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_svec *sx, int xi);
 void blasfeo_sdiain(int kmax, float alpha, struct blasfeo_svec *sx, int xi, struct blasfeo_smat *sA, int ai, int aj);
@@ -102,6 +88,7 @@ void blasfeo_sdiaex_sp(int kmax, float alpha, int *idx, struct blasfeo_smat *sD,
 void blasfeo_sdiaad(int kmax, float alpha, struct blasfeo_svec *sx, int xi, struct blasfeo_smat *sA, int ai, int aj);
 void blasfeo_sdiaad_sp(int kmax, float alpha, struct blasfeo_svec *sx, int xi, int *idx, struct blasfeo_smat *sD, int di, int dj);
 void blasfeo_sdiaadin_sp(int kmax, float alpha, struct blasfeo_svec *sx, int xi, struct blasfeo_svec *sy, int yi, int *idx, struct blasfeo_smat *sD, int di, int dj);
+// row
 void blasfeo_srowin(int kmax, float alpha, struct blasfeo_svec *sx, int xi, struct blasfeo_smat *sA, int ai, int aj);
 void blasfeo_srowex(int kmax, float alpha, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_svec *sx, int xi);
 void blasfeo_srowad(int kmax, float alpha, struct blasfeo_svec *sx, int xi, struct blasfeo_smat *sA, int ai, int aj);
@@ -109,11 +96,20 @@ void blasfeo_srowad_sp(int kmax, float alpha, struct blasfeo_svec *sx, int xi, i
 void blasfeo_srowsw(int kmax, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj);
 void blasfeo_srowpe(int kmax, int *ipiv, struct blasfeo_smat *sA);
 void blasfeo_srowpei(int kmax, int *ipiv, struct blasfeo_smat *sA);
+// col
 void blasfeo_scolin(int kmax, struct blasfeo_svec *sx, int xi, struct blasfeo_smat *sA, int ai, int aj);
 void blasfeo_scolsc(int kmax, float alpha, struct blasfeo_smat *sA, int ai, int aj);
 void blasfeo_scolsw(int kmax, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj);
 void blasfeo_scolpe(int kmax, int *ipiv, struct blasfeo_smat *sA);
 void blasfeo_scolpei(int kmax, int *ipiv, struct blasfeo_smat *sA);
+// vec
+void blasfeo_svecse(int m, float alpha, struct blasfeo_svec *sx, int xi);
+void blasfeo_sveccp(int m, struct blasfeo_svec *sa, int ai, struct blasfeo_svec *sc, int ci);
+void blasfeo_svecsc(int m, float alpha, struct blasfeo_svec *sa, int ai);
+void blasfeo_sveccpsc(int m, float alpha, struct blasfeo_svec *sa, int ai, struct blasfeo_svec *sc, int ci);
+void blasfeo_svecad(int m, float alpha, struct blasfeo_svec *sa, int ai, struct blasfeo_svec *sc, int ci);
+void blasfeo_svecin1(float a, struct blasfeo_svec *sx, int xi);
+float blasfeo_svecex1(struct blasfeo_svec *sx, int xi);
 void blasfeo_svecad_sp(int m, float alpha, struct blasfeo_svec *sx, int xi, int *idx, struct blasfeo_svec *sz, int zi);
 void blasfeo_svecin_sp(int m, float alpha, struct blasfeo_svec *sx, int xi, int *idx, struct blasfeo_svec *sz, int zi);
 void blasfeo_svecex_sp(int m, float alpha, int *idx, struct blasfeo_svec *sx, int x, struct blasfeo_svec *sz, int zi);

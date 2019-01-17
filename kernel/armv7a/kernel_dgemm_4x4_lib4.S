@@ -3,26 +3,27 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
@@ -156,8 +157,6 @@ _inner_kernel_dgemm_add_nt_4x4_lib4:
 	fmacd	d15, d27, d31
 	fldd	d27, [r5, #120] // A
 	fldd	d31, [r6, #120] // B
-
-
 
 	// unroll 2
 	fmacd	d0, d16, d20
@@ -825,15 +824,13 @@ _inner_kernel_dsyrk_l_add_nt_4x4_lib4:
 	// main loop
 1:
 	
-	// prefetch
-	pld		[r5, #128]
-	pld		[r6, #128]
-
 	// unroll 0
 	fmacd	d0, d16, d20
-	fldd	d16, [r5, #64] // A
+	pld		[r5, #128] // prefetch
 	fmacd	d1, d17, d20
+	pld		[r6, #128] // prefetch
 	fmacd	d2, d18, d20
+	fldd	d16, [r5, #64] // A
 	fmacd	d3, d19, d20
 	fldd	d20, [r6, #64] // B
 
@@ -875,24 +872,21 @@ _inner_kernel_dsyrk_l_add_nt_4x4_lib4:
 	fldd	d27, [r5, #120] // A
 	fldd	d31, [r6, #120] // B
 
-	// prefetch
-	pld		[r5, #192]
-	pld		[r6, #192]
-
-	add		r5, r5, #128
-	add		r6, r6, #128
-
 	// unroll 2
 	fmacd	d0, d16, d20
-	fldd	d16, [r5, #0] // A
+	pld		[r6, #192] // prefetch
 	fmacd	d1, d17, d20
+	fldd	d16, [r5, #128] // A
 	fmacd	d2, d18, d20
+	add		r6, r6, #128
 	fmacd	d3, d19, d20
 	fldd	d20, [r6, #0] // B
 
+	pld		[r5, #192] // prefetch
 	fmacd	d5, d17, d21
-	fldd	d17, [r5, #8] // A
+	fldd	d17, [r5, #136] // A
 	fmacd	d6, d18, d21
+	add		r5, r5, #128
 	fmacd	d7, d19, d21
 	fldd	d21, [r6, #8] // B
 
@@ -909,6 +903,7 @@ _inner_kernel_dsyrk_l_add_nt_4x4_lib4:
 	fmacd	d0, d24, d28
 	fldd	d24, [r5, #32] // A
 	fmacd	d1, d25, d28
+	sub		r4, r4, #4
 	fmacd	d2, d26, d28
 	fmacd	d3, d27, d28
 	fldd	d28, [r6, #32] // B
@@ -928,7 +923,6 @@ _inner_kernel_dsyrk_l_add_nt_4x4_lib4:
 	fldd	d27, [r5, #56] // A
 	fldd	d31, [r6, #56] // B
 
-	sub		r4, r4, #4
 	cmp		r4, #4
 	bgt		1b
 
@@ -1067,684 +1061,6 @@ _inner_kernel_dsyrk_l_add_nt_4x4_lib4:
 
 #if defined(OS_LINUX)
 	.size	inner_kernel_dsyrk_l_add_nt_4x4_lib4, .-inner_kernel_dsyrk_l_add_nt_4x4_lib4
-#endif
-#endif
-
-
-
-
-
-// subroutine
-//
-// input arguments:
-// r4   <- k
-// r5   <- A
-// r6   <- B
-//
-// output arguments:
-
-#if MACRO_LEVEL>=2
-	.macro INNER_KERNEL_DGEMM_SUB_NT_4X4_LIB4
-#else
-//	.p2align 4,,15
-#if defined(OS_LINUX)
-	.type inner_kernel_dgemm_sub_nt_4x4_lib4, %function
-inner_kernel_dgemm_sub_nt_4x4_lib4:
-#elif defined(OS_MAC)
-_inner_kernel_dgemm_sub_nt_4x4_lib4:
-#endif
-#endif
-
-	// early return
-	cmp		r4, #0
-	ble		2f // return
-
-	// prefetch
-	pld		[r5, #0]
-	pld		[r6, #0]
-
-	// preload A even
-	fldd	d16, [r5, #0]
-	fldd	d17, [r5, #8]
-	fldd	d18, [r5, #16]
-	fldd	d19, [r5, #24]
-
-	// preload B even
-	fldd	d20, [r6, #0]
-	fldd	d21, [r6, #8]
-	fldd	d22, [r6, #16]
-	fldd	d23, [r6, #24]
-
-	// preload A odd
-	fldd	d24, [r5, #32]
-	fldd	d25, [r5, #40]
-	fldd	d26, [r5, #48]
-	fldd	d27, [r5, #56]
-
-	// preload B odd
-	fldd	d28, [r6, #32]
-	fldd	d29, [r6, #40]
-	fldd	d30, [r6, #48]
-	fldd	d31, [r6, #56]
-
-	// prefetch
-	pld		[r5, #64]
-	pld		[r6, #64]
-
-	cmp		r4, #4
-	ble		0f // consider clean up loop
-
-	// main loop
-1:
-	
-	// prefetch
-	pld		[r5, #128]
-	pld		[r6, #128]
-
-	// unroll 0
-	fnmacd	d0, d16, d20
-	fnmacd	d1, d17, d20
-	fnmacd	d2, d18, d20
-	fnmacd	d3, d19, d20
-	fldd	d20, [r6, #64] // B
-
-	fnmacd	d4, d16, d21
-	fnmacd	d5, d17, d21
-	fnmacd	d6, d18, d21
-	fnmacd	d7, d19, d21
-	fldd	d21, [r6, #72] // B
-
-	fnmacd	d8, d16, d22
-	fnmacd	d9, d17, d22
-	fnmacd	d10, d18, d22
-	fnmacd	d11, d19, d22
-	fldd	d22, [r6, #80] // B
-
-	fnmacd	d12, d16, d23
-	fldd	d16, [r5, #64] // A
-	fnmacd	d13, d17, d23
-	fldd	d17, [r5, #72] // A
-	fnmacd	d14, d18, d23
-	fldd	d18, [r5, #80] // A
-	fnmacd	d15, d19, d23
-	fldd	d19, [r5, #88] // A
-	fldd	d23, [r6, #88] // B
-
-	// unroll 1
-	fnmacd	d0, d24, d28
-	fnmacd	d1, d25, d28
-	fnmacd	d2, d26, d28
-	fnmacd	d3, d27, d28
-	fldd	d28, [r6, #96] // B
-
-	fnmacd	d4, d24, d29
-	fnmacd	d5, d25, d29
-	fnmacd	d6, d26, d29
-	fnmacd	d7, d27, d29
-	fldd	d29, [r6, #104] // B
-
-	fnmacd	d8, d24, d30
-	fnmacd	d9, d25, d30
-	fnmacd	d10, d26, d30
-	fnmacd	d11, d27, d30
-	fldd	d30, [r6, #112] // B
-
-	fnmacd	d12, d24, d31
-	fldd	d24, [r5, #96] // A
-	fnmacd	d13, d25, d31
-	fldd	d25, [r5, #104] // A
-	fnmacd	d14, d26, d31
-	fldd	d26, [r5, #112] // A
-	fnmacd	d15, d27, d31
-	fldd	d27, [r5, #120] // A
-	fldd	d31, [r6, #120] // B
-
-	// prefetch
-	pld		[r5, #192]
-	pld		[r6, #192]
-
-	add		r5, r5, #128
-	add		r6, r6, #128
-
-	// unroll 2
-	fnmacd	d0, d16, d20
-	fnmacd	d1, d17, d20
-	fnmacd	d2, d18, d20
-	fnmacd	d3, d19, d20
-	fldd	d20, [r6, #0] // B
-
-	fnmacd	d4, d16, d21
-	fnmacd	d5, d17, d21
-	fnmacd	d6, d18, d21
-	fnmacd	d7, d19, d21
-	fldd	d21, [r6, #8] // B
-
-	fnmacd	d8, d16, d22
-	fnmacd	d9, d17, d22
-	fnmacd	d10, d18, d22
-	fnmacd	d11, d19, d22
-	fldd	d22, [r6, #16] // B
-
-	fnmacd	d12, d16, d23
-	fldd	d16, [r5, #0] // A
-	fnmacd	d13, d17, d23
-	fldd	d17, [r5, #8] // A
-	fnmacd	d14, d18, d23
-	fldd	d18, [r5, #16] // A
-	fnmacd	d15, d19, d23
-	fldd	d19, [r5, #24] // A
-	fldd	d23, [r6, #24] // B
-
-	// unroll 3
-	fnmacd	d0, d24, d28
-	fnmacd	d1, d25, d28
-	fnmacd	d2, d26, d28
-	fnmacd	d3, d27, d28
-	fldd	d28, [r6, #32] // B
-
-	fnmacd	d4, d24, d29
-	fnmacd	d5, d25, d29
-	fnmacd	d6, d26, d29
-	fnmacd	d7, d27, d29
-	fldd	d29, [r6, #40] // B
-
-	fnmacd	d8, d24, d30
-	fnmacd	d9, d25, d30
-	fnmacd	d10, d26, d30
-	fnmacd	d11, d27, d30
-	fldd	d30, [r6, #48] // B
-
-	fnmacd	d12, d24, d31
-	fldd	d24, [r5, #32] // A
-	fnmacd	d13, d25, d31
-	fldd	d25, [r5, #40] // A
-	fnmacd	d14, d26, d31
-	fldd	d26, [r5, #48] // A
-	fnmacd	d15, d27, d31
-	fldd	d27, [r5, #56] // A
-	fldd	d31, [r6, #56] // B
-
-	sub		r4, r4, #4
-	cmp		r4, #4
-	bgt		1b
-
-0:
-
-	cmp		r4, #3
-	ble		4f
-
-	// unroll 0
-	fnmacd	d0, d16, d20
-	fnmacd	d1, d17, d20
-	fnmacd	d2, d18, d20
-	fnmacd	d3, d19, d20
-	fldd	d20, [r6, #64] // B
-
-	fnmacd	d4, d16, d21
-	fnmacd	d5, d17, d21
-	fnmacd	d6, d18, d21
-	fnmacd	d7, d19, d21
-	fldd	d21, [r6, #72] // B
-
-	fnmacd	d8, d16, d22
-	fnmacd	d9, d17, d22
-	fnmacd	d10, d18, d22
-	fnmacd	d11, d19, d22
-	fldd	d22, [r6, #80] // B
-
-	fnmacd	d12, d16, d23
-	fldd	d16, [r5, #64] // A
-	fnmacd	d13, d17, d23
-	fldd	d17, [r5, #72] // A
-	fnmacd	d14, d18, d23
-	fldd	d18, [r5, #80] // A
-	fnmacd	d15, d19, d23
-	fldd	d19, [r5, #88] // A
-	fldd	d23, [r6, #88] // B
-
-	// unroll 1
-	fnmacd	d0, d24, d28
-	fnmacd	d1, d25, d28
-	fnmacd	d2, d26, d28
-	fnmacd	d3, d27, d28
-	fldd	d28, [r6, #96] // B
-
-	fnmacd	d4, d24, d29
-	fnmacd	d5, d25, d29
-	fnmacd	d6, d26, d29
-	fnmacd	d7, d27, d29
-	fldd	d29, [r6, #104] // B
-
-	fnmacd	d8, d24, d30
-	fnmacd	d9, d25, d30
-	fnmacd	d10, d26, d30
-	fnmacd	d11, d27, d30
-	fldd	d30, [r6, #112] // B
-
-	fnmacd	d12, d24, d31
-	fldd	d24, [r5, #96] // A
-	fnmacd	d13, d25, d31
-	fldd	d25, [r5, #104] // A
-	fnmacd	d14, d26, d31
-	fldd	d26, [r5, #112] // A
-	fnmacd	d15, d27, d31
-	fldd	d27, [r5, #120] // A
-	fldd	d31, [r6, #120] // B
-
-	add		r5, r5, #128
-	add		r6, r6, #128
-
-	// unroll 2
-	fnmacd	d0, d16, d20
-	fnmacd	d1, d17, d20
-	fnmacd	d2, d18, d20
-	fnmacd	d3, d19, d20
-
-	fnmacd	d4, d16, d21
-	fnmacd	d5, d17, d21
-	fnmacd	d6, d18, d21
-	fnmacd	d7, d19, d21
-
-	fnmacd	d8, d16, d22
-	fnmacd	d9, d17, d22
-	fnmacd	d10, d18, d22
-	fnmacd	d11, d19, d22
-
-	fnmacd	d12, d16, d23
-	fnmacd	d13, d17, d23
-	fnmacd	d14, d18, d23
-	fnmacd	d15, d19, d23
-
-	// unroll 3
-	fnmacd	d0, d24, d28
-	fnmacd	d1, d25, d28
-	fnmacd	d2, d26, d28
-	fnmacd	d3, d27, d28
-
-	fnmacd	d4, d24, d29
-	fnmacd	d5, d25, d29
-	fnmacd	d6, d26, d29
-	fnmacd	d7, d27, d29
-
-	fnmacd	d8, d24, d30
-	fnmacd	d9, d25, d30
-	fnmacd	d10, d26, d30
-	fnmacd	d11, d27, d30
-
-	fnmacd	d12, d24, d31
-	fnmacd	d13, d25, d31
-	fnmacd	d14, d26, d31
-	fnmacd	d15, d27, d31
-
-	sub		r4, r4, #4
-
-	b		2f // return
-
-4: // consider clean1-up loop
-
-	cmp		r4, #0
-	ble		2f // return
-
-3: // clean1-up loop
-
-	fldd	d16, [r5, #0] // A
-	fldd	d17, [r5, #8] // A
-	fldd	d18, [r5, #16] // A
-	fldd	d19, [r5, #24] // A
-
-	fldd	d20, [r6, #0] // B
-	fnmacd	d0, d16, d20
-	fnmacd	d1, d17, d20
-	fnmacd	d2, d18, d20
-	fnmacd	d3, d19, d20
-
-	fldd	d21, [r6, #8] // B
-	fnmacd	d4, d16, d21
-	fnmacd	d5, d17, d21
-	fnmacd	d6, d18, d21
-	fnmacd	d7, d19, d21
-
-	fldd	d22, [r6, #16] // B
-	fnmacd	d8, d16, d22
-	fnmacd	d9, d17, d22
-	fnmacd	d10, d18, d22
-	fnmacd	d11, d19, d22
-
-	fldd	d23, [r6, #24] // B
-	fnmacd	d12, d16, d23
-	fnmacd	d13, d17, d23
-	fnmacd	d14, d18, d23
-	fnmacd	d15, d19, d23
-
-	add		r5, r5, #32
-	add		r6, r6, #32
-
-	sub		r4, r4, #1
-	cmp		r4, #0
-	bgt		3b
-
-2: // return
-
-	
-#if MACRO_LEVEL>=2
-	.endm
-#else
-	mov		pc, lr // return
-
-#if defined(OS_LINUX)
-	.size	inner_kernel_dgemm_sub_nt_4x4_lib4, .-inner_kernel_dgemm_sub_nt_4x4_lib4
-#endif
-#endif
-
-
-
-
-
-// subroutine
-//
-// input arguments:
-// r4   <- k
-// r5   <- A
-// r6   <- B
-//
-// output arguments:
-
-#if MACRO_LEVEL>=2
-	.macro INNER_KERNEL_DSYRK_L_SUB_NT_4X4_LIB4
-#else
-//	.p2align 4,,15
-#if defined(OS_LINUX)
-	.type inner_kernel_dsyrk_l_sub_nt_4x4_lib4, %function
-inner_kernel_dsyrk_l_sub_nt_4x4_lib4:
-#elif defined(OS_MAC)
-_inner_kernel_dsyrk_l_sub_nt_4x4_lib4:
-#endif
-#endif
-
-	// early return
-	cmp		r4, #0
-	ble		2f // return
-
-	// prefetch
-	pld		[r5, #0]
-	pld		[r6, #0]
-
-	// preload A even
-	fldd	d16, [r5, #0]
-	fldd	d17, [r5, #8]
-	fldd	d18, [r5, #16]
-	fldd	d19, [r5, #24]
-
-	// preload B even
-	fldd	d20, [r6, #0]
-	fldd	d21, [r6, #8]
-	fldd	d22, [r6, #16]
-	fldd	d23, [r6, #24]
-
-	// preload A odd
-	fldd	d24, [r5, #32]
-	fldd	d25, [r5, #40]
-	fldd	d26, [r5, #48]
-	fldd	d27, [r5, #56]
-
-	// preload B odd
-	fldd	d28, [r6, #32]
-	fldd	d29, [r6, #40]
-	fldd	d30, [r6, #48]
-	fldd	d31, [r6, #56]
-
-	// prefetch
-	pld		[r5, #64]
-	pld		[r6, #64]
-
-	cmp		r4, #4
-	ble		0f // consider clean up loop
-
-	// main loop
-1:
-	
-	// prefetch
-	pld		[r5, #128]
-	pld		[r6, #128]
-
-	// unroll 0
-	fnmacd	d0, d16, d20
-	fldd	d16, [r5, #64] // A
-	fnmacd	d1, d17, d20
-	fnmacd	d2, d18, d20
-	fnmacd	d3, d19, d20
-	fldd	d20, [r6, #64] // B
-
-	fnmacd	d5, d17, d21
-	fldd	d17, [r5, #72] // A
-	fnmacd	d6, d18, d21
-	fnmacd	d7, d19, d21
-	fldd	d21, [r6, #72] // B
-
-	fnmacd	d10, d18, d22
-	fldd	d18, [r5, #80] // A
-	fnmacd	d11, d19, d22
-	fldd	d22, [r6, #80] // B
-
-	fnmacd	d15, d19, d23
-	fldd	d19, [r5, #88] // A
-	fldd	d23, [r6, #88] // B
-
-	// unroll 1
-	fnmacd	d0, d24, d28
-	fldd	d24, [r5, #96] // A
-	fnmacd	d1, d25, d28
-	fnmacd	d2, d26, d28
-	fnmacd	d3, d27, d28
-	fldd	d28, [r6, #96] // B
-
-	fnmacd	d5, d25, d29
-	fldd	d25, [r5, #104] // A
-	fnmacd	d6, d26, d29
-	fnmacd	d7, d27, d29
-	fldd	d29, [r6, #104] // B
-
-	fnmacd	d10, d26, d30
-	fldd	d26, [r5, #112] // A
-	fnmacd	d11, d27, d30
-	fldd	d30, [r6, #112] // B
-
-	fnmacd	d15, d27, d31
-	fldd	d27, [r5, #120] // A
-	fldd	d31, [r6, #120] // B
-
-	// prefetch
-	pld		[r5, #192]
-	pld		[r6, #192]
-
-	add		r5, r5, #128
-	add		r6, r6, #128
-
-	// unroll 2
-	fnmacd	d0, d16, d20
-	fldd	d16, [r5, #0] // A
-	fnmacd	d1, d17, d20
-	fnmacd	d2, d18, d20
-	fnmacd	d3, d19, d20
-	fldd	d20, [r6, #0] // B
-
-	fnmacd	d5, d17, d21
-	fldd	d17, [r5, #8] // A
-	fnmacd	d6, d18, d21
-	fnmacd	d7, d19, d21
-	fldd	d21, [r6, #8] // B
-
-	fnmacd	d10, d18, d22
-	fldd	d18, [r5, #16] // A
-	fnmacd	d11, d19, d22
-	fldd	d22, [r6, #16] // B
-
-	fnmacd	d15, d19, d23
-	fldd	d19, [r5, #24] // A
-	fldd	d23, [r6, #24] // B
-
-	// unroll 3
-	fnmacd	d0, d24, d28
-	fldd	d24, [r5, #32] // A
-	fnmacd	d1, d25, d28
-	fnmacd	d2, d26, d28
-	fnmacd	d3, d27, d28
-	fldd	d28, [r6, #32] // B
-
-	fnmacd	d5, d25, d29
-	fldd	d25, [r5, #40] // A
-	fnmacd	d6, d26, d29
-	fnmacd	d7, d27, d29
-	fldd	d29, [r6, #40] // B
-
-	fnmacd	d10, d26, d30
-	fldd	d26, [r5, #48] // A
-	fnmacd	d11, d27, d30
-	fldd	d30, [r6, #48] // B
-
-	fnmacd	d15, d27, d31
-	fldd	d27, [r5, #56] // A
-	fldd	d31, [r6, #56] // B
-
-	sub		r4, r4, #4
-	cmp		r4, #4
-	bgt		1b
-
-0:
-
-	cmp		r4, #3
-	ble		4f
-
-	// unroll 0
-	fnmacd	d0, d16, d20
-	fldd	d16, [r5, #64] // A
-	fnmacd	d1, d17, d20
-	fnmacd	d2, d18, d20
-	fnmacd	d3, d19, d20
-	fldd	d20, [r6, #64] // B
-
-	fnmacd	d5, d17, d21
-	fldd	d17, [r5, #72] // A
-	fnmacd	d6, d18, d21
-	fnmacd	d7, d19, d21
-	fldd	d21, [r6, #72] // B
-
-	fnmacd	d10, d18, d22
-	fldd	d18, [r5, #80] // A
-	fnmacd	d11, d19, d22
-	fldd	d22, [r6, #80] // B
-
-	fnmacd	d15, d19, d23
-	fldd	d19, [r5, #88] // A
-	fldd	d23, [r6, #88] // B
-
-	// unroll 1
-	fnmacd	d0, d24, d28
-	fldd	d24, [r5, #96] // A
-	fnmacd	d1, d25, d28
-	fnmacd	d2, d26, d28
-	fnmacd	d3, d27, d28
-	fldd	d28, [r6, #96] // B
-
-	fnmacd	d5, d25, d29
-	fldd	d25, [r5, #104] // A
-	fnmacd	d6, d26, d29
-	fnmacd	d7, d27, d29
-	fldd	d29, [r6, #104] // B
-
-	fnmacd	d10, d26, d30
-	fldd	d26, [r5, #112] // A
-	fnmacd	d11, d27, d30
-	fldd	d30, [r6, #112] // B
-
-	fnmacd	d15, d27, d31
-	fldd	d27, [r5, #120] // A
-	fldd	d31, [r6, #120] // B
-
-	add		r5, r5, #128
-	add		r6, r6, #128
-
-	// unroll 2
-	fnmacd	d0, d16, d20
-	fnmacd	d1, d17, d20
-	fnmacd	d2, d18, d20
-	fnmacd	d3, d19, d20
-
-	fnmacd	d5, d17, d21
-	fnmacd	d6, d18, d21
-	fnmacd	d7, d19, d21
-
-	fnmacd	d10, d18, d22
-	fnmacd	d11, d19, d22
-
-	fnmacd	d15, d19, d23
-
-	// unroll 3
-	fnmacd	d0, d24, d28
-	fnmacd	d1, d25, d28
-	fnmacd	d2, d26, d28
-	fnmacd	d3, d27, d28
-
-	fnmacd	d5, d25, d29
-	fnmacd	d6, d26, d29
-	fnmacd	d7, d27, d29
-
-	fnmacd	d10, d26, d30
-	fnmacd	d11, d27, d30
-
-	fnmacd	d15, d27, d31
-
-	sub		r4, r4, #4
-
-	b		2f // return
-
-4: // consider clean1-up loop
-
-	cmp		r4, #0
-	ble		2f // return
-
-3: // clean1-up loop
-
-	fldd	d16, [r5, #0] // A
-	fldd	d17, [r5, #8] // A
-	fldd	d18, [r5, #16] // A
-	fldd	d19, [r5, #24] // A
-
-	fldd	d20, [r6, #0] // B
-	fnmacd	d0, d16, d20
-	fnmacd	d1, d17, d20
-	fnmacd	d2, d18, d20
-	fnmacd	d3, d19, d20
-
-	fldd	d21, [r6, #8] // B
-	fnmacd	d5, d17, d21
-	fnmacd	d6, d18, d21
-	fnmacd	d7, d19, d21
-
-	fldd	d22, [r6, #16] // B
-	fnmacd	d10, d18, d22
-	fnmacd	d11, d19, d22
-
-	fldd	d23, [r6, #24] // B
-	fnmacd	d15, d19, d23
-
-	add		r5, r5, #32
-	add		r6, r6, #32
-
-	sub		r4, r4, #1
-	cmp		r4, #0
-	bgt		3b
-
-2: // return
-
-	
-#if MACRO_LEVEL>=2
-	.endm
-#else
-	mov		pc, lr // return
-
-#if defined(OS_LINUX)
-	.size	inner_kernel_dsyrk_l_sub_nt_4x4_lib4, .-inner_kernel_dsyrk_l_sub_nt_4x4_lib4
 #endif
 #endif
 
@@ -2167,57 +1483,135 @@ _inner_scale_ab_4x4_lib4:
 // subroutine
 //
 // input arguments:
+// r4   <- beta
+// r5   <- C
+//
+// output arguments:
+
+#if MACRO_LEVEL>=2
+	.macro INNER_SCALE_M1B_4X4_LIB4
+#else
+//	.p2align 4,,15
+#if defined(OS_LINUX)
+	.type inner_scale_m1b_4x4_lib4, %function
+inner_scale_m1b_4x4_lib4:
+#elif defined(OS_MAC)
+_inner_scale_m1b_4x4_lib4:
+#endif
+#endif
+
+	fldd	d18, [r4, #0] // beta
+	fldd	d17, .LC01 // 0.0
+	fcmped	d18, d17
+	fmstat
+	beq		0f // end
+
+	fldd	d17, [r5, #0] // C
+	fmscd	d0, d17, d18
+	fldd	d17, [r5, #8] // C
+	fmscd	d1, d17, d18
+	fldd	d17, [r5, #16] // C
+	fmscd	d2, d17, d18
+	fldd	d17, [r5, #24] // C
+	fmscd	d3, d17, d18
+
+	fldd	d17, [r5, #32] // C
+	fmscd	d4, d17, d18
+	fldd	d17, [r5, #40] // C
+	fmscd	d5, d17, d18
+	fldd	d17, [r5, #48] // C
+	fmscd	d6, d17, d18
+	fldd	d17, [r5, #56] // C
+	fmscd	d7, d17, d18
+
+	fldd	d17, [r5, #64] // C
+	fmscd	d8, d17, d18
+	fldd	d17, [r5, #72] // C
+	fmscd	d9, d17, d18
+	fldd	d17, [r5, #80] // C
+	fmscd	d10, d17, d18
+	fldd	d17, [r5, #88] // C
+	fmscd	d11, d17, d18
+
+	fldd	d17, [r5, #96] // C
+	fmscd	d12, d17, d18
+	fldd	d17, [r5, #104] // C
+	fmscd	d13, d17, d18
+	fldd	d17, [r5, #112] // C
+	fmscd	d14, d17, d18
+	fldd	d17, [r5, #120] // C
+	fmscd	d15, d17, d18
+
+0:
+
+#if MACRO_LEVEL>=2
+	.endm
+#else
+	mov		pc, lr // return
+
+#if defined(OS_LINUX)
+	.size	inner_scale_m1b_4x4_lib4, .-inner_scale_m1b_4x4_lib4
+#endif
+#endif
+
+
+
+
+
+// subroutine
+//
+// input arguments:
 // r4   <- C
 //
 // output arguments:
 
 #if MACRO_LEVEL>=2
-	.macro INNER_SCALE_11_4X4_LIB4
+	.macro INNER_SCALE_M11_4X4_LIB4
 #else
 //	.p2align 4,,15
 #if defined(OS_LINUX)
-	.type inner_scale_11_4x4_lib4, %function
-inner_scale_11_4x4_lib4:
+	.type inner_scale_m11_4x4_lib4, %function
+inner_scale_m11_4x4_lib4:
 #elif defined(OS_MAC)
-_inner_scale_11_4x4_lib4:
+_inner_scale_m11_4x4_lib4:
 #endif
 #endif
 
 	fldd	d17, [r4, #0] // C
-	faddd	d0, d0, d17
+	fsubd	d0, d17, d0
 	fldd	d17, [r4, #8] // C
-	faddd	d1, d1, d17
+	fsubd	d1, d17, d1
 	fldd	d17, [r4, #16] // C
-	faddd	d2, d2, d17
+	fsubd	d2, d17, d2
 	fldd	d17, [r4, #24] // C
-	faddd	d3, d3, d17
+	fsubd	d3, d17, d3
 
 	fldd	d17, [r4, #32] // C
-	faddd	d4, d4, d17
+	fsubd	d4, d17, d4
 	fldd	d17, [r4, #40] // C
-	faddd	d5, d5, d17
+	fsubd	d5, d17, d5
 	fldd	d17, [r4, #48] // C
-	faddd	d6, d6, d17
+	fsubd	d6, d17, d6
 	fldd	d17, [r4, #56] // C
-	faddd	d7, d7, d17
+	fsubd	d7, d17, d7
 
 	fldd	d17, [r4, #64] // C
-	faddd	d8, d8, d17
+	fsubd	d8, d17, d8
 	fldd	d17, [r4, #72] // C
-	faddd	d9, d9, d17
+	fsubd	d9, d17, d9
 	fldd	d17, [r4, #80] // C
-	faddd	d10, d10, d17
+	fsubd	d10, d17, d10
 	fldd	d17, [r4, #88] // C
-	faddd	d11, d11, d17
+	fsubd	d11, d17, d11
 
 	fldd	d17, [r4, #96] // C
-	faddd	d12, d12, d17
+	fsubd	d12, d17, d12
 	fldd	d17, [r4, #104] // C
-	faddd	d13, d13, d17
+	fsubd	d13, d17, d13
 	fldd	d17, [r4, #112] // C
-	faddd	d14, d14, d17
+	fsubd	d14, d17, d14
 	fldd	d17, [r4, #120] // C
-	faddd	d15, d15, d17
+	fsubd	d15, d17, d15
 
 
 #if MACRO_LEVEL>=2
@@ -2226,7 +1620,7 @@ _inner_scale_11_4x4_lib4:
 	mov		pc, lr // return
 
 #if defined(OS_LINUX)
-	.size	inner_scale_11_4x4_lib4, .-inner_scale_11_4x4_lib4
+	.size	inner_scale_m11_4x4_lib4, .-inner_scale_m11_4x4_lib4
 #endif
 #endif
 
@@ -2346,6 +1740,8 @@ _inner_store_l_4x4_lib4:
 	.word 0
 	.word 0
 
+
+
 //                               r0        r1             r2         r3         sp+0          sp+4       sp+8
 // void kernel_dgemm_nt_4x4_lib4(int kmax, double *alpha, double *A, double *B, double *beta, double *C, double *D)
 
@@ -2355,7 +1751,7 @@ _inner_store_l_4x4_lib4:
 	.type	kernel_dgemm_nt_4x4_lib4, %function
 kernel_dgemm_nt_4x4_lib4:
 #elif defined(OS_MAC)
-	.global	kernel_dgemm_nt_4x4_lib4
+	.global	_kernel_dgemm_nt_4x4_lib4
 _kernel_dgemm_nt_4x4_lib4:
 #endif
 
@@ -2466,7 +1862,7 @@ _kernel_dgemm_nt_4x4_lib4:
 	.type	kernel_dgemm_nn_4x4_lib4, %function
 kernel_dgemm_nn_4x4_lib4:
 #elif defined(OS_MAC)
-	.global	kernel_dgemm_nn_4x4_lib4
+	.global	_kernel_dgemm_nn_4x4_lib4
 _kernel_dgemm_nn_4x4_lib4:
 #endif
 
@@ -2692,8 +2088,8 @@ _kernel_dsyrk_nt_l_4x4_lib4:
 
 
 
-//                                      r0        r1         r2         r3         sp+0       sp+4       rsp+8
-// void kernel_dtrsm_nt_rl_inv_4x4_lib4(int kmax, double *A, double *B, double *C, double *D, double *E, double *inv_diag_E);
+//                                      r0        r1         r2         r3            sp+0       sp+4       sp+8       sp+12
+// void kernel_dtrsm_nt_rl_inv_4x4_lib4(int kmax, double *A, double *B, double *beta, double *C, double *D, double *E, double *inv_diag_E);
 
 //	.p2align 4,,15
 #if defined(OS_LINUX)
@@ -2742,35 +2138,36 @@ _kernel_dtrsm_nt_rl_inv_4x4_lib4:
 	mov		r6, r2 // B
 
 #if MACRO_LEVEL>=2
-	INNER_KERNEL_DGEMM_SUB_NT_4X4_LIB4
+	INNER_KERNEL_DGEMM_ADD_NT_4X4_LIB4
 #else
 #if defined(OS_LINUX)
-	bl	inner_kernel_dgemm_sub_nt_4x4_lib4
+	bl	inner_kernel_dgemm_add_nt_4x4_lib4
 #elif defined(OS_MAC)
-	bl	_inner_kernel_dgemm_sub_nt_4x4_lib4
+	bl	_inner_kernel_dgemm_add_nt_4x4_lib4
 #endif
 #endif
 
 
 
-	// call inner blend for alpha=1.0 and beta=1.0
-	mov		r4, r3 // C
+	// call inner blend for alpha=1.0 and beta
+	mov		r4, r3 // beta
+	ldr		r5, [fp, #0] // C
 
 #if MACRO_LEVEL>=1
-	INNER_SCALE_11_4X4_LIB4
+	INNER_SCALE_M1B_4X4_LIB4
 #else
 #if defined(OS_LINUX)
-	bl inner_scale_11_4x4_lib4
+	bl inner_scale_m1b_4x4_lib4
 #elif defined(OS_MAC)
-	bl _inner_scale_11_4x4_lib4
+	bl _inner_scale_m1b_4x4_lib4
 #endif
 #endif
 
 
 
 	// solution
-	ldr		r4, [fp, #4] // E
-	ldr		r5, [fp, #8] // inv_diag_E
+	ldr		r4, [fp, #8] // E
+	ldr		r5, [fp, #12] // inv_diag_E
 
 #if MACRO_LEVEL>=1
 	INNER_EDGE_DTRSM_RLT_INV_4X4_LIB4
@@ -2785,7 +2182,7 @@ _kernel_dtrsm_nt_rl_inv_4x4_lib4:
 
 
 	// store
-	ldr		r4, [fp, #0] // D
+	ldr		r4, [fp, #4] // D
 
 #if MACRO_LEVEL>=1
 	INNER_STORE_4X4_LIB4
@@ -2866,12 +2263,12 @@ _kernel_dpotrf_nt_l_4x4_lib4:
 	mov		r6, r2 // B
 
 #if MACRO_LEVEL>=2
-	INNER_KERNEL_DSYRK_L_SUB_NT_4X4_LIB4
+	INNER_KERNEL_DSYRK_L_ADD_NT_4X4_LIB4
 #else
 #if defined(OS_LINUX)
-	bl	inner_kernel_dsyrk_l_sub_nt_4x4_lib4
+	bl	inner_kernel_dsyrk_l_add_nt_4x4_lib4
 #elif defined(OS_MAC)
-	bl	_inner_kernel_dsyrk_l_sub_nt_4x4_lib4
+	bl	_inner_kernel_dsyrk_l_add_nt_4x4_lib4
 #endif
 #endif
 
@@ -2881,12 +2278,12 @@ _kernel_dpotrf_nt_l_4x4_lib4:
 	mov		r4, r3 // C
 
 #if MACRO_LEVEL>=1
-	INNER_SCALE_11_4X4_LIB4
+	INNER_SCALE_M11_4X4_LIB4
 #else
 #if defined(OS_LINUX)
-	bl inner_scale_11_4x4_lib4
+	bl inner_scale_m11_4x4_lib4
 #elif defined(OS_MAC)
-	bl _inner_scale_11_4x4_lib4
+	bl _inner_scale_m11_4x4_lib4
 #endif
 #endif
 
@@ -3000,18 +2397,37 @@ _kernel_dgemm_dtrsm_nt_rl_inv_4x4_lib4:
 
 
 
+	fnegd	d0, d0
+	fnegd	d1, d1
+	fnegd	d2, d2
+	fnegd	d3, d3
+	fnegd	d4, d4
+	fnegd	d5, d5
+	fnegd	d6, d6
+	fnegd	d7, d7
+	fnegd	d8, d8
+	fnegd	d9, d9
+	fnegd	d10, d10
+	fnegd	d11, d11
+	fnegd	d12, d12
+	fnegd	d13, d13
+	fnegd	d14, d14
+	fnegd	d15, d15
+
+
+
 	// call inner kernel dsyrk l nt sub
 	mov		r4, r3 // kmax
 	ldr		r5, [fp, #0] // Am
 	ldr		r6, [fp, #4] // Bm
 
 #if MACRO_LEVEL>=2
-	INNER_KERNEL_DGEMM_SUB_NT_4X4_LIB4
+	INNER_KERNEL_DGEMM_ADD_NT_4X4_LIB4
 #else
 #if defined(OS_LINUX)
-	bl	inner_kernel_dgemm_sub_nt_4x4_lib4
+	bl	inner_kernel_dgemm_add_nt_4x4_lib4
 #elif defined(OS_MAC)
-	bl	_inner_kernel_dgemm_sub_nt_4x4_lib4
+	bl	_inner_kernel_dgemm_add_nt_4x4_lib4
 #endif
 #endif
 
@@ -3021,12 +2437,12 @@ _kernel_dgemm_dtrsm_nt_rl_inv_4x4_lib4:
 	ldr		r4, [fp, #8] // C
 
 #if MACRO_LEVEL>=1
-	INNER_SCALE_11_4X4_LIB4
+	INNER_SCALE_M11_4X4_LIB4
 #else
 #if defined(OS_LINUX)
-	bl inner_scale_11_4x4_lib4
+	bl inner_scale_m11_4x4_lib4
 #elif defined(OS_MAC)
-	bl _inner_scale_11_4x4_lib4
+	bl _inner_scale_m11_4x4_lib4
 #endif
 #endif
 
@@ -3141,18 +2557,37 @@ _kernel_dsyrk_dpotrf_nt_l_4x4_lib4:
 
 
 
+	fnegd	d0, d0
+	fnegd	d1, d1
+	fnegd	d2, d2
+	fnegd	d3, d3
+	fnegd	d4, d4
+	fnegd	d5, d5
+	fnegd	d6, d6
+	fnegd	d7, d7
+	fnegd	d8, d8
+	fnegd	d9, d9
+	fnegd	d10, d10
+	fnegd	d11, d11
+	fnegd	d12, d12
+	fnegd	d13, d13
+	fnegd	d14, d14
+	fnegd	d15, d15
+
+
+
 	// call inner kernel dsyrk l nt sub
 	mov		r4, r3 // kmax
 	ldr		r5, [fp, #0] // Am
 	ldr		r6, [fp, #4] // Bm
 
 #if MACRO_LEVEL>=2
-	INNER_KERNEL_DSYRK_L_SUB_NT_4X4_LIB4
+	INNER_KERNEL_DSYRK_L_ADD_NT_4X4_LIB4
 #else
 #if defined(OS_LINUX)
-	bl	inner_kernel_dsyrk_l_sub_nt_4x4_lib4
+	bl	inner_kernel_dsyrk_l_add_nt_4x4_lib4
 #elif defined(OS_MAC)
-	bl	_inner_kernel_dsyrk_l_sub_nt_4x4_lib4
+	bl	_inner_kernel_dsyrk_l_add_nt_4x4_lib4
 #endif
 #endif
 
@@ -3162,12 +2597,12 @@ _kernel_dsyrk_dpotrf_nt_l_4x4_lib4:
 	ldr		r4, [fp, #8] // C
 
 #if MACRO_LEVEL>=1
-	INNER_SCALE_11_4X4_LIB4
+	INNER_SCALE_M11_4X4_LIB4
 #else
 #if defined(OS_LINUX)
-	bl inner_scale_11_4x4_lib4
+	bl inner_scale_m11_4x4_lib4
 #elif defined(OS_MAC)
-	bl _inner_scale_11_4x4_lib4
+	bl _inner_scale_m11_4x4_lib4
 #endif
 #endif
 
@@ -3216,6 +2651,17 @@ _kernel_dsyrk_dpotrf_nt_l_4x4_lib4:
 #if defined(OS_LINUX)
 	.size	kernel_dsyrk_dpotrf_nt_l_4x4_lib4, .-kernel_dsyrk_dpotrf_nt_l_4x4_lib4
 #endif
+
+
+
+
+
+#if defined(BLAS_API)
+
+#include "kernel_dgemm_4x4_lib.S"
+
+#endif
+
 
 
 

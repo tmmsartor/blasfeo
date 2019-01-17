@@ -3,26 +3,27 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
@@ -49,7 +50,7 @@ void ZEROS_ALIGN(REAL **pA, int row, int col)
 	{
 #if defined(OS_WINDOWS)
 	*pA = (REAL *) _aligned_malloc( (row*col)*sizeof(REAL), 64 );
-#elif defined(__DSPACE__)
+#elif defined(__DSPACE__) | defined(__BACHMANN__)
 	*pA = malloc((row*col)*sizeof(REAL));
 #else
 	void *temp;
@@ -138,6 +139,20 @@ void PRINT_TO_FILE_MAT(FILE *file, int row, int col, REAL *A, int lda)
 	fprintf(file, "\n");
 	}
 
+/* prints a matrix in column-major format */
+void PRINT_TO_FILE_EXP_MAT(FILE *file, int row, int col, REAL *A, int lda)
+	{
+	int i, j;
+	for(i=0; i<row; i++)
+		{
+		for(j=0; j<col; j++)
+			{
+			fprintf(file, "%9.5e ", A[i+lda*j]);
+			}
+		fprintf(file, "\n");
+		}
+	fprintf(file, "\n");
+	}
 
 
 /* prints a matrix in column-major format */
@@ -176,7 +191,7 @@ void PRINT_TO_FILE_TRAN_MAT(FILE *file, int row, int col, REAL *A, int lda)
 
 
 /* prints a matrix in column-major format (exponential notation) */
-void PRINT_E_MAT(int m, int n, REAL *A, int lda)
+void PRINT_EXP_MAT(int m, int n, REAL *A, int lda)
 	{
 	int i, j;
 	for(i=0; i<m; i++)
@@ -193,7 +208,7 @@ void PRINT_E_MAT(int m, int n, REAL *A, int lda)
 
 
 /* prints the transposed of a matrix in column-major format (exponential notation) */
-void PRINT_E_TRAN_MAT(int row, int col, REAL *A, int lda)
+void PRINT_EXP_TRAN_MAT(int row, int col, REAL *A, int lda)
 	{
 	int i, j;
 	for(j=0; j<col; j++)

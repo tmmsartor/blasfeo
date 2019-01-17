@@ -3,26 +3,27 @@
 # This file is part of BLASFEO.                                                                   #
 #                                                                                                 #
 # BLASFEO -- BLAS For Embedded Optimization.                                                      #
-# Copyright (C) 2016-2017 by Gianluca Frison.                                                     #
+# Copyright (C) 2016-2018 by Gianluca Frison.                                                     #
 # Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              #
 # All rights reserved.                                                                            #
 #                                                                                                 #
-# HPMPC is free software; you can redistribute it and/or                                          #
-# modify it under the terms of the GNU Lesser General Public                                      #
-# License as published by the Free Software Foundation; either                                    #
-# version 2.1 of the License, or (at your option) any later version.                              #
+# This program is free software: you can redistribute it and/or modify                            #
+# it under the terms of the GNU General Public License as published by                            #
+# the Free Software Foundation, either version 3 of the License, or                               #
+# (at your option) any later version                                                              #.
 #                                                                                                 #
-# HPMPC is distributed in the hope that it will be useful,                                        #
+# This program is distributed in the hope that it will be useful,                                 #
 # but WITHOUT ANY WARRANTY; without even the implied warranty of                                  #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            #
-# See the GNU Lesser General Public License for more details.                                     #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   #
+# GNU General Public License for more details.                                                    #
 #                                                                                                 #
-# You should have received a copy of the GNU Lesser General Public                                #
-# License along with HPMPC; if not, write to the Free Software                                    #
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  #
+# You should have received a copy of the GNU General Public License                               #
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.                          #
 #                                                                                                 #
-# Author: Gianluca Frison, giaf (at) dtu.dk                                                       #
-#                          gianluca.frison (at) imtek.uni-freiburg.de                             #
+# The authors designate this particular file as subject to the "Classpath" exception              #
+# as provided by the authors in the LICENSE file that accompained this code.                      #
+#                                                                                                 #
+# Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             #
 #                                                                                                 #
 ###################################################################################################
 
@@ -45,48 +46,49 @@ OBJS += \
 		kernel/avx2/kernel_dgemm_8x8_lib4.o \
 		kernel/avx2/kernel_dgemm_8x4_lib4.o \
 		kernel/avx2/kernel_dgemm_4x4_lib4.o \
-		kernel/avx2/kernel_dgemm_10xX_lib4.o \
-		kernel/avx2/kernel_dgemm_8x2_lib4.o \
-		kernel/avx2/kernel_dgemm_6xX_lib4.o \
-		kernel/avx2/kernel_dgemm_4x2_lib4.o \
 		kernel/avx/kernel_dgemm_diag_lib4.o \
 		kernel/avx2/kernel_dgemv_8_lib4.o \
 		kernel/avx/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
 		kernel/avx2/kernel_dsymv_6_lib4.o \
-		kernel/avx2/kernel_dgetrf_pivot_4_lib4.o \
+		kernel/avx2/kernel_dgetrf_pivot_lib4.o \
+		kernel/avx2/kernel_dgetrf_pivot_lib.o \
 		kernel/avx/kernel_dgeqrf_4_lib4.o \
 		kernel/avx2/kernel_dgebp_lib4.o \
 		kernel/avx2/kernel_dgelqf_4_lib4.o \
 		kernel/avx2/kernel_dgetr_lib4.o \
 		kernel/avx/kernel_dgecp_lib4.o \
+		kernel/avx/kernel_dpack_lib4.o \
 		\
 		kernel/avx2/kernel_sgemm_24x4_lib8.o \
 		kernel/avx2/kernel_sgemm_16x4_lib8.o \
 		kernel/avx2/kernel_sgemm_8x8_lib8.o \
 		kernel/avx2/kernel_sgemm_8x4_lib8.o \
+		kernel/generic/kernel_sgemm_8x4_lib8.o \
 		kernel/avx/kernel_sgemm_diag_lib8.o \
 		kernel/avx/kernel_sgemv_8_lib8.o \
 		kernel/avx/kernel_sgemv_4_lib8.o \
 		kernel/avx/kernel_sgecpsc_lib8.o \
 		kernel/avx/kernel_sgetr_lib8.o \
 		kernel/avx/kernel_sgead_lib8.o \
+		\
+		kernel/kernel_align_x64.o\
 
 # blas
 OBJS += \
-		blas/d_blas1_lib4.o \
-		blas/d_blas2_lib4.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib4.o \
-		blas/d_blas3_diag_lib4.o \
-		blas/d_lapack_lib4.o \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
 		\
-		blas/s_blas1_lib8.o \
-		blas/s_blas2_lib8.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib8.o \
-		blas/s_blas3_diag_lib8.o \
-		blas/s_lapack_lib8.o \
+		blasfeo_api/s_blas1_lib8.o \
+		blasfeo_api/s_blas2_lib8.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib8.o \
+		blasfeo_api/s_blas3_diag_lib8.o \
+		blasfeo_api/s_lapack_lib8.o \
 
 endif
 
@@ -100,49 +102,51 @@ OBJS += \
 
 # kernels
 OBJS += \
-		kernel/avx/kernel_dgemm_8x4_lib4.o \
-		kernel/avx/kernel_dgemm_8x2_lib4.o \
-		kernel/avx/kernel_dgemm_4x4_lib4.o \
-		kernel/avx/kernel_dgemm_4x2_lib4.o \
 		kernel/avx/kernel_dgemm_12x4_lib4.o \
-		kernel/avx/kernel_dgemm_10xX_lib4.o \
-		kernel/avx/kernel_dgemm_6xX_lib4.o \
+		kernel/avx/kernel_dgemm_8x4_lib4.o \
+		kernel/avx/kernel_dgemm_4x4_lib4.o \
 		kernel/avx/kernel_dgemm_diag_lib4.o \
 		kernel/avx/kernel_dgemv_12_lib4.o \
 		kernel/avx/kernel_dgemv_8_lib4.o \
 		kernel/avx/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
 		kernel/avx/kernel_dsymv_6_lib4.o \
-		kernel/avx/kernel_dgetrf_pivot_4_lib4.o \
+		kernel/avx/kernel_dgetrf_pivot_lib4.o \
+		kernel/avx/kernel_dgetrf_pivot_lib.o \
 		kernel/avx/kernel_dgeqrf_4_lib4.o \
 		kernel/avx/kernel_dgebp_lib4.o \
 		kernel/avx/kernel_dgecp_lib4.o \
 		kernel/avx/kernel_dgetr_lib4.o \
+		kernel/avx/kernel_dpack_lib4.o \
 		\
 		kernel/avx/kernel_sgemm_16x4_lib8.o \
 		kernel/avx/kernel_sgemm_8x8_lib8.o \
 		kernel/avx/kernel_sgemm_8x4_lib8.o \
+		kernel/generic/kernel_sgemm_8x4_lib8.o \
 		kernel/avx/kernel_sgemm_diag_lib8.o \
 		kernel/avx/kernel_sgemv_8_lib8.o \
 		kernel/avx/kernel_sgemv_4_lib8.o \
 		kernel/avx/kernel_sgecpsc_lib8.o \
 		kernel/avx/kernel_sgetr_lib8.o \
 		kernel/avx/kernel_sgead_lib8.o \
+		\
+		kernel/kernel_align_x64.o\
 
 # blas
 OBJS  += \
-		blas/d_blas1_lib4.o \
-		blas/d_blas2_lib4.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib4.o \
-		blas/d_blas3_diag_lib4.o \
-		blas/d_lapack_lib4.o \
-		blas/s_blas1_lib8.o \
-		blas/s_blas2_lib8.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib8.o \
-		blas/s_blas3_diag_lib8.o \
-		blas/s_lapack_lib8.o \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
+		\
+		blasfeo_api/s_blas1_lib8.o \
+		blasfeo_api/s_blas2_lib8.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib8.o \
+		blasfeo_api/s_blas3_diag_lib8.o \
+		blasfeo_api/s_lapack_lib8.o \
 
 endif
 
@@ -157,38 +161,43 @@ OBJS += \
 OBJS += \
 		kernel/sse3/kernel_dgemm_4x4_lib4.o \
 		kernel/sse3/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_diag_lib4.o \
-		kernel/c99/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dsymv_4_lib4.o \
-		kernel/c99/kernel_dgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_dgeqrf_4_lib4.o \
-		kernel/c99/kernel_dgecp_lib4.o \
-		kernel/c99/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dgemm_4x4_lib4.o \
+		kernel/generic/kernel_dgemm_diag_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dsymv_4_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib.o \
+		kernel/generic/kernel_dgeqrf_4_lib4.o \
+		kernel/generic/kernel_dgecp_lib4.o \
+		kernel/generic/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dpack_lib4.o \
 		\
-		kernel/c99/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_diag_lib4.o \
-		kernel/c99/kernel_sgemv_4_lib4.o \
-		kernel/c99/kernel_ssymv_4_lib4.o \
-		kernel/c99/kernel_sgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_sgecp_lib4.o \
-		kernel/c99/kernel_sgetr_lib4.o \
+		kernel/sse3/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_diag_lib4.o \
+		kernel/generic/kernel_sgemv_4_lib4.o \
+		kernel/generic/kernel_ssymv_4_lib4.o \
+		kernel/generic/kernel_sgetrf_pivot_lib4.o \
+		kernel/generic/kernel_sgecp_lib4.o \
+		kernel/generic/kernel_sgetr_lib4.o \
+		\
+		kernel/kernel_align_x64.o\
 
 # blas
 OBJS += \
-		blas/d_blas1_lib4.o \
-		blas/d_blas2_lib4.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib4.o \
-		blas/d_blas3_diag_lib4.o \
-		blas/d_lapack_lib4.o \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
 		\
-		blas/s_blas1_lib4.o \
-		blas/s_blas2_lib4.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib4.o \
-		blas/s_blas3_diag_lib4.o \
-		blas/s_lapack_lib4.o \
+		blasfeo_api/s_blas1_lib4.o \
+		blasfeo_api/s_blas2_lib4.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib4.o \
+		blasfeo_api/s_blas3_diag_lib4.o \
+		blasfeo_api/s_lapack_lib4.o \
 
 endif
 
@@ -203,38 +212,42 @@ OBJS += \
 # kernels
 OBJS += \
 		kernel/fma/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_diag_lib4.o \
-		kernel/c99/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dsymv_4_lib4.o \
-		kernel/c99/kernel_dgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_dgeqrf_4_lib4.o \
-		kernel/c99/kernel_dgecp_lib4.o \
-		kernel/c99/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dgemm_4x4_lib4.o \
+		kernel/generic/kernel_dgemm_diag_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dsymv_4_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib.o \
+		kernel/generic/kernel_dgeqrf_4_lib4.o \
+		kernel/generic/kernel_dgecp_lib4.o \
+		kernel/generic/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dpack_lib4.o \
 		\
-		kernel/c99/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_diag_lib4.o \
-		kernel/c99/kernel_sgemv_4_lib4.o \
-		kernel/c99/kernel_ssymv_4_lib4.o \
-		kernel/c99/kernel_sgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_sgecp_lib4.o \
-		kernel/c99/kernel_sgetr_lib4.o \
+		kernel/generic/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_diag_lib4.o \
+		kernel/generic/kernel_sgemv_4_lib4.o \
+		kernel/generic/kernel_ssymv_4_lib4.o \
+		kernel/generic/kernel_sgetrf_pivot_lib4.o \
+		kernel/generic/kernel_sgecp_lib4.o \
+		kernel/generic/kernel_sgetr_lib4.o \
+		\
+		kernel/kernel_align_x64.o\
 
 # blas
 OBJS += \
-		blas/d_blas1_lib4.o \
-		blas/d_blas2_lib4.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib4.o \
-		blas/d_blas3_diag_lib4.o \
-		blas/d_lapack_lib4.o \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
 		\
-		blas/s_blas1_lib4.o \
-		blas/s_blas2_lib4.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib4.o \
-		blas/s_blas3_diag_lib4.o \
-		blas/s_lapack_lib4.o \
+		blasfeo_api/s_blas1_lib4.o \
+		blasfeo_api/s_blas2_lib4.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib4.o \
+		blasfeo_api/s_blas3_diag_lib4.o \
+		blasfeo_api/s_lapack_lib4.o \
 
 endif
 
@@ -250,40 +263,44 @@ OBJS += \
 OBJS += \
 		kernel/avx_x86/kernel_dgemm_4x4_lib4.o \
 		kernel/avx_x86/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_diag_lib4.o \
-		kernel/c99/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dsymv_4_lib4.o \
-		kernel/c99/kernel_dgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_dgeqrf_4_lib4.o \
-		kernel/c99/kernel_dgecp_lib4.o \
-		kernel/c99/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dgemm_4x4_lib4.o \
+		kernel/generic/kernel_dgemm_diag_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dsymv_4_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib.o \
+		kernel/generic/kernel_dgeqrf_4_lib4.o \
+		kernel/generic/kernel_dgecp_lib4.o \
+		kernel/generic/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dpack_lib4.o \
 		\
 		kernel/avx_x86/kernel_sgemm_4x4_lib4.o \
 		kernel/avx_x86/kernel_sgemv_4_lib4.o \
-		kernel/c99/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_diag_lib4.o \
-		kernel/c99/kernel_sgemv_4_lib4.o \
-		kernel/c99/kernel_ssymv_4_lib4.o \
-		kernel/c99/kernel_sgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_sgecp_lib4.o \
-		kernel/c99/kernel_sgetr_lib4.o \
+		kernel/generic/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_diag_lib4.o \
+		kernel/generic/kernel_sgemv_4_lib4.o \
+		kernel/generic/kernel_ssymv_4_lib4.o \
+		kernel/generic/kernel_sgetrf_pivot_lib4.o \
+		kernel/generic/kernel_sgecp_lib4.o \
+		kernel/generic/kernel_sgetr_lib4.o \
+		\
+		kernel/kernel_align_x86.o\
 
 # blas
 OBJS += \
-		blas/d_blas1_lib4.o \
-		blas/d_blas2_lib4.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib4.o \
-		blas/d_blas3_diag_lib4.o \
-		blas/d_lapack_lib4.o \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
 		\
-		blas/s_blas1_lib4.o \
-		blas/s_blas2_lib4.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib4.o \
-		blas/s_blas3_diag_lib4.o \
-		blas/s_lapack_lib4.o \
+		blasfeo_api/s_blas1_lib4.o \
+		blasfeo_api/s_blas2_lib4.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib4.o \
+		blasfeo_api/s_blas3_diag_lib4.o \
+		blasfeo_api/s_lapack_lib4.o \
 
 endif
 
@@ -297,38 +314,45 @@ OBJS += \
 
 # kernels
 OBJS += \
-		kernel/c99/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_diag_lib4.o \
-		kernel/c99/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dsymv_4_lib4.o \
-		kernel/c99/kernel_dgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_dgeqrf_4_lib4.o \
-		kernel/c99/kernel_dgecp_lib4.o \
-		kernel/c99/kernel_dgetr_lib4.o \
+		kernel/sse3_x86/kernel_dgemm_4x2_lib4.o \
+		kernel/sse3_x86/kernel_dgemm_2x2_lib4.o \
+		kernel/sse3_x86/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dgemm_4x4_lib4.o \
+		kernel/generic/kernel_dgemm_diag_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dsymv_4_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib.o \
+		kernel/generic/kernel_dgeqrf_4_lib4.o \
+		kernel/generic/kernel_dgecp_lib4.o \
+		kernel/generic/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dpack_lib4.o \
 		\
-		kernel/c99/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_diag_lib4.o \
-		kernel/c99/kernel_sgemv_4_lib4.o \
-		kernel/c99/kernel_ssymv_4_lib4.o \
-		kernel/c99/kernel_sgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_sgecp_lib4.o \
-		kernel/c99/kernel_sgetr_lib4.o \
+		kernel/generic/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_diag_lib4.o \
+		kernel/generic/kernel_sgemv_4_lib4.o \
+		kernel/generic/kernel_ssymv_4_lib4.o \
+		kernel/generic/kernel_sgetrf_pivot_lib4.o \
+		kernel/generic/kernel_sgecp_lib4.o \
+		kernel/generic/kernel_sgetr_lib4.o \
+		\
+		kernel/kernel_align_x86.o\
 
 # blas
 OBJS += \
-		blas/d_blas1_lib4.o \
-		blas/d_blas2_lib4.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib4.o \
-		blas/d_blas3_diag_lib4.o \
-		blas/d_lapack_lib4.o \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
 		\
-		blas/s_blas1_lib4.o \
-		blas/s_blas2_lib4.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib4.o \
-		blas/s_blas3_diag_lib4.o \
-		blas/s_lapack_lib4.o \
+		blasfeo_api/s_blas1_lib4.o \
+		blasfeo_api/s_blas2_lib4.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib4.o \
+		blasfeo_api/s_blas3_diag_lib4.o \
+		blasfeo_api/s_lapack_lib4.o \
 
 endif
 
@@ -344,43 +368,48 @@ OBJS += \
 OBJS += \
 		kernel/armv8a/kernel_dgemm_8x4_lib4.o \
 		kernel/armv8a/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_diag_lib4.o \
-		kernel/c99/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dsymv_4_lib4.o \
-		kernel/c99/kernel_dgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_dgeqrf_4_lib4.o \
-		kernel/c99/kernel_dgecp_lib4.o \
-		kernel/c99/kernel_dgetr_lib4.o \
+		kernel/armv8a/kernel_dpack_lib4.o \
+		kernel/generic/kernel_dgemm_4x4_lib4.o \
+		kernel/generic/kernel_dgemm_diag_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dsymv_4_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib.o \
+		kernel/generic/kernel_dgeqrf_4_lib4.o \
+		kernel/generic/kernel_dgecp_lib4.o \
+		kernel/generic/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dpack_lib4.o \
 		\
 		kernel/armv8a/kernel_sgemm_16x4_lib4.o \
 		kernel/armv8a/kernel_sgemm_12x4_lib4.o \
 		kernel/armv8a/kernel_sgemm_8x8_lib4.o \
 		kernel/armv8a/kernel_sgemm_8x4_lib4.o \
 		kernel/armv8a/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_diag_lib4.o \
-		kernel/c99/kernel_sgemv_4_lib4.o \
-		kernel/c99/kernel_ssymv_4_lib4.o \
-		kernel/c99/kernel_sgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_sgecp_lib4.o \
-		kernel/c99/kernel_sgetr_lib4.o \
+		kernel/generic/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_diag_lib4.o \
+		kernel/generic/kernel_sgemv_4_lib4.o \
+		kernel/generic/kernel_ssymv_4_lib4.o \
+		kernel/generic/kernel_sgetrf_pivot_lib4.o \
+		kernel/generic/kernel_sgecp_lib4.o \
+		kernel/generic/kernel_sgetr_lib4.o \
+		\
+		kernel/kernel_align_generic.o\
 
 # blas
 OBJS += \
-		blas/d_blas1_lib4.o \
-		blas/d_blas2_lib4.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib4.o \
-		blas/d_blas3_diag_lib4.o \
-		blas/d_lapack_lib4.o \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
 		\
-		blas/s_blas1_lib4.o \
-		blas/s_blas2_lib4.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib4.o \
-		blas/s_blas3_diag_lib4.o \
-		blas/s_lapack_lib4.o \
+		blasfeo_api/s_blas1_lib4.o \
+		blasfeo_api/s_blas2_lib4.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib4.o \
+		blasfeo_api/s_blas3_diag_lib4.o \
+		blasfeo_api/s_lapack_lib4.o \
 
 endif
 
@@ -397,43 +426,48 @@ OBJS += \
 		kernel/armv8a/kernel_dgemm_12x4_lib4.o \
 		kernel/armv8a/kernel_dgemm_8x4_lib4.o \
 		kernel/armv8a/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_diag_lib4.o \
-		kernel/c99/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dsymv_4_lib4.o \
-		kernel/c99/kernel_dgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_dgeqrf_4_lib4.o \
-		kernel/c99/kernel_dgecp_lib4.o \
-		kernel/c99/kernel_dgetr_lib4.o \
+		kernel/armv8a/kernel_dpack_lib4.o \
+		kernel/generic/kernel_dgemm_4x4_lib4.o \
+		kernel/generic/kernel_dgemm_diag_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dsymv_4_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib.o \
+		kernel/generic/kernel_dgeqrf_4_lib4.o \
+		kernel/generic/kernel_dgecp_lib4.o \
+		kernel/generic/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dpack_lib4.o \
 		\
 		kernel/armv8a/kernel_sgemm_16x4_lib4.o \
 		kernel/armv8a/kernel_sgemm_12x4_lib4.o \
 		kernel/armv8a/kernel_sgemm_8x8_lib4.o \
 		kernel/armv8a/kernel_sgemm_8x4_lib4.o \
 		kernel/armv8a/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_diag_lib4.o \
-		kernel/c99/kernel_sgemv_4_lib4.o \
-		kernel/c99/kernel_ssymv_4_lib4.o \
-		kernel/c99/kernel_sgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_sgecp_lib4.o \
-		kernel/c99/kernel_sgetr_lib4.o \
+		kernel/generic/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_diag_lib4.o \
+		kernel/generic/kernel_sgemv_4_lib4.o \
+		kernel/generic/kernel_ssymv_4_lib4.o \
+		kernel/generic/kernel_sgetrf_pivot_lib4.o \
+		kernel/generic/kernel_sgecp_lib4.o \
+		kernel/generic/kernel_sgetr_lib4.o \
+		\
+		kernel/kernel_align_generic.o\
 
 # blas
 OBJS += \
-		blas/d_blas1_lib4.o \
-		blas/d_blas2_lib4.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib4.o \
-		blas/d_blas3_diag_lib4.o \
-		blas/d_lapack_lib4.o \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
 		\
-		blas/s_blas1_lib4.o \
-		blas/s_blas2_lib4.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib4.o \
-		blas/s_blas3_diag_lib4.o \
-		blas/s_lapack_lib4.o \
+		blasfeo_api/s_blas1_lib4.o \
+		blasfeo_api/s_blas2_lib4.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib4.o \
+		blasfeo_api/s_blas3_diag_lib4.o \
+		blasfeo_api/s_lapack_lib4.o \
 
 endif
 
@@ -447,40 +481,97 @@ OBJS += \
 # kernels
 OBJS += \
 		kernel/armv7a/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_diag_lib4.o \
-		kernel/c99/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dsymv_4_lib4.o \
-		kernel/c99/kernel_dgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_dgeqrf_4_lib4.o \
-		kernel/c99/kernel_dgecp_lib4.o \
-		kernel/c99/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dgemm_4x4_lib4.o \
+		kernel/generic/kernel_dgemm_diag_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dsymv_4_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib.o \
+		kernel/generic/kernel_dgeqrf_4_lib4.o \
+		kernel/generic/kernel_dgecp_lib4.o \
+		kernel/generic/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dpack_lib4.o \
 		\
 		kernel/armv7a/kernel_sgemm_12x4_lib4.o \
 		kernel/armv7a/kernel_sgemm_8x4_lib4.o \
 		kernel/armv7a/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_diag_lib4.o \
-		kernel/c99/kernel_sgemv_4_lib4.o \
-		kernel/c99/kernel_ssymv_4_lib4.o \
-		kernel/c99/kernel_sgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_sgecp_lib4.o \
-		kernel/c99/kernel_sgetr_lib4.o \
+		kernel/generic/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_diag_lib4.o \
+		kernel/generic/kernel_sgemv_4_lib4.o \
+		kernel/generic/kernel_ssymv_4_lib4.o \
+		kernel/generic/kernel_sgetrf_pivot_lib4.o \
+		kernel/generic/kernel_sgecp_lib4.o \
+		kernel/generic/kernel_sgetr_lib4.o \
+		\
+		kernel/kernel_align_generic.o\
 
 # blas
 OBJS += \
-		blas/d_blas1_lib4.o \
-		blas/d_blas2_lib4.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib4.o \
-		blas/d_blas3_diag_lib4.o \
-		blas/d_lapack_lib4.o \
-		blas/s_blas1_lib4.o \
-		blas/s_blas2_lib4.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib4.o \
-		blas/s_blas3_diag_lib4.o \
-		blas/s_lapack_lib4.o \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
+		\
+		blasfeo_api/s_blas1_lib4.o \
+		blasfeo_api/s_blas2_lib4.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib4.o \
+		blasfeo_api/s_blas3_diag_lib4.o \
+		blasfeo_api/s_lapack_lib4.o \
+
+endif
+
+ifeq ($(TARGET), ARMV7A_ARM_CORTEX_A7)
+# aux
+OBJS += \
+		auxiliary/d_aux_lib4.o \
+		auxiliary/s_aux_lib4.o \
+		auxiliary/m_aux_lib44.o \
+
+# kernels
+OBJS += \
+		kernel/armv7a/kernel_dgemm_4x4_lib4.o \
+		kernel/generic/kernel_dgemm_4x4_lib4.o \
+		kernel/generic/kernel_dgemm_diag_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dsymv_4_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib.o \
+		kernel/generic/kernel_dgeqrf_4_lib4.o \
+		kernel/generic/kernel_dgecp_lib4.o \
+		kernel/generic/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dpack_lib4.o \
+		\
+		kernel/armv7a/kernel_sgemm_12x4_lib4.o \
+		kernel/armv7a/kernel_sgemm_8x4_lib4.o \
+		kernel/armv7a/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_diag_lib4.o \
+		kernel/generic/kernel_sgemv_4_lib4.o \
+		kernel/generic/kernel_ssymv_4_lib4.o \
+		kernel/generic/kernel_sgetrf_pivot_lib4.o \
+		kernel/generic/kernel_sgecp_lib4.o \
+		kernel/generic/kernel_sgetr_lib4.o \
+		\
+		kernel/kernel_align_generic.o\
+
+# blas
+OBJS += \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
+		\
+		blasfeo_api/s_blas1_lib4.o \
+		blasfeo_api/s_blas2_lib4.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib4.o \
+		blasfeo_api/s_blas3_diag_lib4.o \
+		blasfeo_api/s_lapack_lib4.o \
 
 endif
 
@@ -494,41 +585,71 @@ OBJS += \
 
 # kernels
 OBJS += \
-		kernel/c99/kernel_dgemm_4x4_lib4.o \
-		kernel/c99/kernel_dgemm_diag_lib4.o \
-		kernel/c99/kernel_dgemv_4_lib4.o \
-		kernel/c99/kernel_dsymv_4_lib4.o \
-		kernel/c99/kernel_dgecp_lib4.o \
-		kernel/c99/kernel_dgetr_lib4.o \
-		kernel/c99/kernel_dgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_dgeqrf_4_lib4.o \
+		kernel/generic/kernel_dgemm_4x4_lib4.o \
+		kernel/generic/kernel_dgemm_diag_lib4.o \
+		kernel/generic/kernel_dgemv_4_lib4.o \
+		kernel/generic/kernel_dsymv_4_lib4.o \
+		kernel/generic/kernel_dgecp_lib4.o \
+		kernel/generic/kernel_dgetr_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib4.o \
+		kernel/generic/kernel_dgetrf_pivot_lib.o \
+		kernel/generic/kernel_dgeqrf_4_lib4.o \
+		kernel/generic/kernel_dpack_lib4.o \
 		\
-		kernel/c99/kernel_sgemm_4x4_lib4.o \
-		kernel/c99/kernel_sgemm_diag_lib4.o \
-		kernel/c99/kernel_sgemv_4_lib4.o \
-		kernel/c99/kernel_ssymv_4_lib4.o \
-		kernel/c99/kernel_sgetrf_pivot_4_lib4.o \
-		kernel/c99/kernel_sgecp_lib4.o \
-		kernel/c99/kernel_sgetr_lib4.o \
+		kernel/generic/kernel_sgemm_4x4_lib4.o \
+		kernel/generic/kernel_sgemm_diag_lib4.o \
+		kernel/generic/kernel_sgemv_4_lib4.o \
+		kernel/generic/kernel_ssymv_4_lib4.o \
+		kernel/generic/kernel_sgetrf_pivot_lib4.o \
+		kernel/generic/kernel_sgecp_lib4.o \
+		kernel/generic/kernel_sgetr_lib4.o \
+		\
+		kernel/kernel_align_generic.o\
 
 # blas
 OBJS += \
-		blas/d_blas1_lib4.o \
-		blas/d_blas2_lib4.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib4.o \
-		blas/d_blas3_diag_lib4.o \
-		blas/d_lapack_lib4.o \
-		blas/s_blas1_lib4.o \
-		blas/s_blas2_lib4.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib4.o \
-		blas/s_blas3_diag_lib4.o \
-		blas/s_lapack_lib4.o \
+		blasfeo_api/d_blas1_lib4.o \
+		blasfeo_api/d_blas2_lib4.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib4.o \
+		blasfeo_api/d_blas3_diag_lib4.o \
+		blasfeo_api/d_lapack_lib4.o \
+		\
+		blasfeo_api/s_blas1_lib4.o \
+		blasfeo_api/s_blas2_lib4.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib4.o \
+		blasfeo_api/s_blas3_diag_lib4.o \
+		blasfeo_api/s_lapack_lib4.o \
+
+endif # GENERIC
+
+ifeq ($(BLAS_API), 1)
+OBJS += \
+		blas_api/dcopy.o \
+		blas_api/dgemm.o \
+		blas_api/dsyrk.o \
+		blas_api/dtrmm.o \
+		blas_api/dtrsm.o \
+		blas_api/dgesv.o \
+		blas_api/dgetrf.o \
+		blas_api/dgetrs.o \
+		blas_api/dlaswp.o \
+		blas_api/dposv.o \
+		blas_api/dpotrf.o \
+		blas_api/dpotrs.o \
+		blas_api/dtrtrs.o \
 
 endif
 
-else # LA_REFERENCE | LA_BLAS
+ifeq ($(CBLAS_API), 1)
+OBJS += \
+		cblas_api/CBLAS/src/cblas_dgemm.o \
+		cblas_api/CBLAS/src/cblas_globals.o \
+
+endif
+
+else # LA_HIGH_PERFORMANCE vs LA_REFERENCE | LA_BLAS
 
 # aux
 OBJS += \
@@ -538,19 +659,25 @@ OBJS += \
 
 # blas
 OBJS += \
-		blas/d_blas1_lib.o \
-		blas/d_blas2_lib.o \
-		blas/d_blas2_diag_lib.o \
-		blas/d_blas3_lib.o \
-		blas/d_blas3_diag_lib.o \
-		blas/d_lapack_lib.o \
+		blasfeo_api/d_blas1_lib.o \
+		blasfeo_api/d_blas2_lib.o \
+		blasfeo_api/d_blas2_diag_lib.o \
+		blasfeo_api/d_blas3_lib.o \
+		blasfeo_api/d_blas3_diag_lib.o \
+		blasfeo_api/d_lapack_lib.o \
 		\
-		blas/s_blas1_lib.o \
-		blas/s_blas2_lib.o \
-		blas/s_blas2_diag_lib.o \
-		blas/s_blas3_lib.o \
-		blas/s_blas3_diag_lib.o \
-		blas/s_lapack_lib.o \
+		blasfeo_api/s_blas1_lib.o \
+		blasfeo_api/s_blas2_lib.o \
+		blasfeo_api/s_blas2_diag_lib.o \
+		blasfeo_api/s_blas3_lib.o \
+		blasfeo_api/s_blas3_diag_lib.o \
+		blasfeo_api/s_lapack_lib.o \
+
+ifeq ($(BLAS_API), 1)
+OBJS += \
+		blas_api/dgemm_ref.o \
+
+endif
 
 endif # LA choice
 
@@ -581,10 +708,61 @@ OBJS_REF += \
 		auxiliary/s_aux_libref.o \
 		auxiliary/d_aux_ext_dep_libref.o \
 		auxiliary/s_aux_ext_dep_libref.o \
-		blas/d_blas3_libref.o \
-		blas/s_blas3_libref.o \
+		blasfeo_api/d_blas1_libref.o \
+		blasfeo_api/d_blas2_libref.o \
+		blasfeo_api/d_blas2_diag_libref.o \
+		blasfeo_api/d_blas3_libref.o \
+		blasfeo_api/d_blas3_diag_libref.o \
+		blasfeo_api/d_lapack_libref.o \
+		blasfeo_api/s_blas1_libref.o \
+		blasfeo_api/s_blas2_libref.o \
+		blasfeo_api/s_blas2_diag_libref.o \
+		blasfeo_api/s_blas3_libref.o \
+		blasfeo_api/s_blas3_diag_libref.o \
+		blasfeo_api/s_lapack_libref.o \
 #
 endif
+
+
+
+ifeq ($(SANDBOX_MODE), 1)
+
+ifeq ($(TARGET), X64_INTEL_HASWELL)
+OBJS += sandbox/kernel_avx2.o
+endif
+ifeq ($(TARGET), X64_INTEL_SANDY_BRIDGE)
+OBJS += sandbox/kernel_avx.o
+endif
+ifeq ($(TARGET), X64_INTEL_CORE)
+OBJS += sandbox/kernel_sse3.o
+endif
+ifeq ($(TARGET), X64_AMD_BULLDOZER)
+OBJS += sandbox/kernel_avx.o
+endif
+ifeq ($(TARGET), X86_AMD_JAGUAR)
+OBJS += sandbox/kernel_avx_x86.o
+endif
+ifeq ($(TARGET), X86_AMD_BARCELONA)
+OBJS += sandbox/kernel_sse3_x86.o
+endif
+ifeq ($(TARGET), ARMV8A_ARM_CORTEX_A57)
+OBJS += sandbox/kernel_armv8a.o
+endif
+ifeq ($(TARGET), ARMV8A_ARM_CORTEX_A53)
+OBJS += sandbox/kernel_armv8a.o
+endif
+ifeq ($(TARGET), ARMV7A_ARM_CORTEX_A15)
+OBJS += sandbox/kernel_armv7a.o
+endif
+ifeq ($(TARGET), ARMV7A_ARM_CORTEX_A7)
+OBJS += sandbox/kernel_armv7a.o
+endif
+ifeq ($(TARGET), GENERIC)
+OBJS += sandbox/kernel_generic.o
+endif
+
+endif
+
 
 
 # Define targets
@@ -597,16 +775,21 @@ all: clean static_library
 static_library: target
 	( cd kernel; $(MAKE) obj)
 	( cd auxiliary; $(MAKE) obj)
-	( cd blas; $(MAKE) obj)
+	( cd blasfeo_api; $(MAKE) obj)
+	( cd blas_api; $(MAKE) obj)
+ifeq ($(CBLAS_API), 1)
+	( cd cblas_api; $(MAKE) obj)
+endif
+ifeq ($(SANDBOX_MODE), 1)
+	( cd sandbox; $(MAKE) obj)
+endif
 	$(AR) rcs libblasfeo.a $(OBJS)
 	mv libblasfeo.a ./lib/
-ifeq ($(TESTING_MODE), 1)
-	$(AR) rcs libblasfeo_ref.a $(OBJS_REF)
-	mv libblasfeo_ref.a ./lib/
-endif
 	@echo
 	@echo " libblasfeo.a static library build complete."
 ifeq ($(TESTING_MODE), 1)
+	$(AR) rcs libblasfeo_ref.a $(OBJS_REF)
+	mv libblasfeo_ref.a ./lib/
 	@echo " libblasfeo_ref.a static library build complete."
 endif
 	@echo
@@ -616,15 +799,23 @@ endif
 shared_library: target
 	( cd auxiliary; $(MAKE) obj)
 	( cd kernel; $(MAKE) obj)
-	( cd blas; $(MAKE) obj)
-	$(CC) -shared -o libblasfeo.so $(OBJS)
-	mv libblasfeo.so ./lib/
-ifeq ($(TESTING_MODE), 1)
-	$(CC) -shared -o libblasfeo_ref.so $(OBJS_REF)
-	mv libblasfeo_ref.so ./lib/
+	( cd blasfeo_api; $(MAKE) obj)
+	( cd blas_api; $(MAKE) obj)
+ifeq ($(CBLAS_API), 1)
+	( cd cblas_api; $(MAKE) obj)
 endif
+ifeq ($(SANDBOX_MODE), 1)
+	( cd sandbox; $(MAKE) obj)
+endif
+	$(CC) -shared -o libblasfeo.so $(OBJS) -lm #-Wl,-Bsymbolic
+	mv libblasfeo.so ./lib/
 	@echo
 	@echo " libblasfeo.so shared library build complete."
+ifeq ($(TESTING_MODE), 1)
+	$(CC) -shared -o libblasfeo_ref.so $(OBJS_REF) -lm
+	mv libblasfeo_ref.so ./lib/
+	@echo " libblasfeo_ref.so shared library build complete."
+endif
 	@echo
 
 
@@ -667,17 +858,35 @@ ifeq ($(TARGET), X86_AMD_BARCELONA)
 	echo "#endif" >> ./include/blasfeo_target.h
 #	echo "#define TARGET X86_AMD_BARCELONA" >> ./include/blasfeo_target.h
 endif
-ifeq ($(TARGET), GENERIC)
-	echo "#ifndef TARGET_GENERIC" > ./include/blasfeo_target.h
-	echo "#define TARGET_GENERIC" >> ./include/blasfeo_target.h
+ifeq ($(TARGET), ARMV8A_ARM_CORTEX_A57)
+	echo "#ifndef TARGET_ARMV8A_ARM_CORTEX_A57" > ./include/blasfeo_target.h
+	echo "#define TARGET_ARMV8A_ARM_CORTEX_A57" >> ./include/blasfeo_target.h
 	echo "#endif" >> ./include/blasfeo_target.h
-#	echo "#define TARGET GENERIC" >> ./include/blasfeo_target.h
+#	echo "#define TARGET ARMV8A_ARM_CORTEX_A57" >> ./include/blasfeo_target.h
+endif
+ifeq ($(TARGET), ARMV8A_ARM_CORTEX_A53)
+	echo "#ifndef TARGET_ARMV8A_ARM_CORTEX_A53" > ./include/blasfeo_target.h
+	echo "#define TARGET_ARMV8A_ARM_CORTEX_A53" >> ./include/blasfeo_target.h
+	echo "#endif" >> ./include/blasfeo_target.h
+#	echo "#define TARGET ARMV8A_ARM_CORTEX_A53" >> ./include/blasfeo_target.h
 endif
 ifeq ($(TARGET), ARMV7A_ARM_CORTEX_A15)
 	echo "#ifndef TARGET_ARMV7A_ARM_CORTEX_A15" > ./include/blasfeo_target.h
 	echo "#define TARGET_ARMV7A_ARM_CORTEX_A15" >> ./include/blasfeo_target.h
 	echo "#endif" >> ./include/blasfeo_target.h
 #	echo "#define TARGET ARMV7A_ARM_CORTEX_A15" >> ./include/blasfeo_target.h
+endif
+ifeq ($(TARGET), ARMV7A_ARM_CORTEX_A7)
+	echo "#ifndef TARGET_ARMV7A_ARM_CORTEX_A7" > ./include/blasfeo_target.h
+	echo "#define TARGET_ARMV7A_ARM_CORTEX_A7" >> ./include/blasfeo_target.h
+	echo "#endif" >> ./include/blasfeo_target.h
+#	echo "#define TARGET ARMV7A_ARM_CORTEX_A7" >> ./include/blasfeo_target.h
+endif
+ifeq ($(TARGET), GENERIC)
+	echo "#ifndef TARGET_GENERIC" > ./include/blasfeo_target.h
+	echo "#define TARGET_GENERIC" >> ./include/blasfeo_target.h
+	echo "#endif" >> ./include/blasfeo_target.h
+#	echo "#define TARGET GENERIC" >> ./include/blasfeo_target.h
 endif
 ifeq ($(LA), HIGH_PERFORMANCE)
 	echo "#ifndef LA_HIGH_PERFORMANCE" >> ./include/blasfeo_target.h
@@ -700,6 +909,21 @@ endif
 ifeq ($(EXT_DEP), 1)
 	echo "#ifndef EXT_DEP" >> ./include/blasfeo_target.h
 	echo "#define EXT_DEP" >> ./include/blasfeo_target.h
+	echo "#endif" >> ./include/blasfeo_target.h
+endif
+ifeq ($(BLAS_API), 1)
+	echo "#ifndef BLAS_API" >> ./include/blasfeo_target.h
+	echo "#define BLAS_API" >> ./include/blasfeo_target.h
+	echo "#endif" >> ./include/blasfeo_target.h
+endif
+ifeq ($(FORTRAN_BLAS_API), 1)
+	echo "#ifndef FORTRAN_BLAS_API" >> ./include/blasfeo_target.h
+	echo "#define FORTRAN_BLAS_API" >> ./include/blasfeo_target.h
+	echo "#endif" >> ./include/blasfeo_target.h
+endif
+ifeq ($(CBLAS_API), 1)
+	echo "#ifndef CBLAS_API" >> ./include/blasfeo_target.h
+	echo "#define CBLAS_API" >> ./include/blasfeo_target.h
 	echo "#endif" >> ./include/blasfeo_target.h
 endif
 
@@ -726,10 +950,13 @@ install_shared:
 clean:
 	make -C auxiliary clean
 	make -C kernel clean
-	make -C blas clean
+	make -C blasfeo_api clean
+	make -C blas_api clean
+	make -C cblas_api clean
 	make -C examples clean
 	make -C tests clean
 	make -C benchmarks clean
+	make -C sandbox clean
 
 
 # deep clean
@@ -742,13 +969,19 @@ deep_clean: clean
 	make -C tests clean_all
 	make -C benchmarks clean_all
 
-# directory for tests  binaries
-BINARY_DIR = build/$(LA)/$(TARGET)
+
 
 ### benchmarks
 
+
+# single benchmark
+
 deploy_to_benchmarks:
 	mkdir -p ./benchmarks/$(BINARY_DIR)/
+	mkdir -p ./benchmarks/$(BINARY_DIR)/BLASFEO_API/
+ifeq ($(BLAS_API), 1)
+	mkdir -p ./benchmarks/$(BINARY_DIR)/BLAS_API/
+endif
 	cp ./lib/libblasfeo.a ./benchmarks/$(BINARY_DIR)/
 
 build_benchmarks:
@@ -762,21 +995,44 @@ benchmarks: deploy_to_benchmarks build_benchmarks
 run_benchmarks:
 	make -C benchmarks run
 
+figures_benchmark_one:
+	make -C benchmarks figures_benchmark_one
 
 
-build_benchmarks_all:
-	make -C benchmarks all
+# BLASFEO API benchmark
+
+build_benchmarks_blasfeo_api_all:
+	make -C benchmarks blasfeo_api_all
 	@echo
 	@echo "Benchmarks build complete."
 	@echo
 
-benchmarks_all: deploy_to_benchmarks build_benchmarks_all
+benchmarks_blasfeo_api_all: deploy_to_benchmarks build_benchmarks_blasfeo_api_all
 
-run_benchmarks_all:
-	make -C benchmarks run_all
+run_benchmarks_blasfeo_api_all:
+	make -C benchmarks run_blasfeo_api_all
 
-print_figures_benchmark_all:
-	make -C benchmarks print_figures
+figures_benchmark_blasfeo_api_all:
+	make -C benchmarks figures_benchmark_blasfeo_api_all
+
+
+# BLAS API benchmark
+
+build_benchmarks_blas_api_all:
+	make -C benchmarks blas_api_all
+	@echo
+	@echo "Benchmarks build complete."
+	@echo
+
+benchmarks_blas_api_all: deploy_to_benchmarks build_benchmarks_blas_api_all
+
+run_benchmarks_blas_api_all:
+	make -C benchmarks run_blas_api_all
+
+figures_benchmark_blas_api_all:
+	make -C benchmarks figures_benchmark_blas_api_all
+
+
 
 ### examples
 
@@ -794,6 +1050,26 @@ examples: deploy_to_examples build_examples
 
 run_examples:
 	make -C examples run
+
+
+
+### sandbox
+
+build_sandbox:
+	make -C sandbox build
+	@echo
+	@echo "Sandbox build complete."
+	@echo
+
+disassembly_sandbox:
+	make -C sandbox disassembly
+
+sandbox: build_sandbox
+
+run_sandbox:
+	make -C sandbox run
+
+
 
 ### tests
 

@@ -1,0 +1,61 @@
+BLASFEO ChangeLog
+
+
+
+====================================================================
+Version 0.1.1-master
+17-Jan-2019
+
+common:
+	* example_d_riccati_recursion: add trf for blas_api
+	* add CBLAS source (only add to libblasfeo what needed)
+
+BLASFEO_API:
+	* stable version of dsyrk_ln for all targets
+	* dsyrk_ut for all targets
+	* dtrsm_llnn for all targets
+	* renamed blasfeo_{d/s}getrf_{no/row}pivot => blasfeo_{d/s}getrf_{n/r}p
+
+BLAS_API:
+	* dsyrk for all targets
+	* dtrmm_rlnn for all targets
+	* dtrsm for all targets
+	* dgesv for all targets
+	* dgetrf for all targets
+	* dgetrs for all targets
+	* dposv for all targets
+	* dpotrf for all targets
+	* dpotrs for all targets
+	* dtrtrs for all targets
+	* dcopy for all targets
+
+CBLAS_API
+	* dgemm
+
+x64:
+	* AMD_BULLDOZER:
+		- fix performance bug (mix of legacy and VEX code)
+		- add optimized kernel_dgemm_nn_4x4_lib4
+
+ARMv8A:
+	* Cortex A57:
+		- improve kernels dgemm_nn & dgemm_nt lib4
+		- add kernels dgemm_nn & dgemm_nt lib4c
+	* Cortex A53:
+		- add optimized kernels dgemm_nn lib4
+		- add kernels dgemm_nn & dgemm_nt lib4c (not fully optimized)
+
+
+
+====================================================================
+Version 0.1.0
+19-Oct-2018
+
+common:
+	* initial release
+
+BLASFEO_API:
+	* stable version of dgemm for all targets
+	
+BLAS_API:
+	* stable version of dgemm for all targets

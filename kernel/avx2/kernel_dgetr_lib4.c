@@ -3,26 +3,27 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
@@ -753,4 +754,72 @@ void kernel_dgetr_4_0_lib4(int kmax, double *A, int sda, double *B)
 		}
 	return;
 	}
+
+
+
+#if 0
+// transposed of general matrices, read across panels, write along panels
+void kernel_dpacp_tn_4_lib4(int kmax, int offsetA, double *A, int sda, double *B)
+	{
+
+	const int ps = 4;
+
+	__m256d
+		v0, v1, v2, v3, v4, v5, v6, v7;
+
+	int k;
+
+	int kna = (ps-offsetA)%ps;
+	kna = kmax<kna ? kmax : kna;
+
+	k = 0;
+	if(kna>0)
+		{
+		for( ; k<kna; k++)
+			{
+			//
+			B[0+ps*0] = A[0+ps*0];
+			B[1+ps*0] = A[0+ps*1];
+			B[2+ps*0] = A[0+ps*2];
+			B[3+ps*0] = A[0+ps*3];
+
+			A += 1;
+			B += ps;
+			}
+		A += ps*(sda-1);
+		}
+	for(; k<kmax-3; k+=4)
+		{
+
+		v0 = _mm256_insertf128_pd( _mm256_castpd128_pd256( _mm_load_pd( &A[0+ps*0] ) ), _mm_load_pd( &A[0+ps*2]) , 0x1 ); // 00 10 02 12
+		v1 = _mm256_insertf128_pd( _mm256_castpd128_pd256( _mm_load_pd( &A[0+ps*1] ) ), _mm_load_pd( &A[0+ps*3]) , 0x1 ); // 01 11 03 13
+		v2 = _mm256_insertf128_pd( _mm256_castpd128_pd256( _mm_load_pd( &A[2+ps*0] ) ), _mm_load_pd( &A[2+ps*2]) , 0x1 ); // 20 30 22 32
+		v3 = _mm256_insertf128_pd( _mm256_castpd128_pd256( _mm_load_pd( &A[2+ps*1] ) ), _mm_load_pd( &A[2+ps*3]) , 0x1 ); // 21 31 23 33
+		
+		v4 = _mm256_unpacklo_pd( v0, v1 ); // 00 01 02 03
+		_mm256_store_pd( &B[0+ps*0], v4 );
+		v5 = _mm256_unpackhi_pd( v0, v1 ); // 10 11 12 13
+		_mm256_store_pd( &B[0+ps*1], v5 );
+		v6 = _mm256_unpacklo_pd( v2, v3 ); // 20 21 22 23
+		_mm256_store_pd( &B[0+ps*2], v6 );
+		v7 = _mm256_unpackhi_pd( v2, v3 ); // 30 31 32 33
+		_mm256_store_pd( &B[0+ps*3], v7 );
+
+		A += ps*sda;
+		B += ps*ps;
+		}
+	for( ; k<kmax; k++)
+		{
+		//
+		B[0+ps*0] = A[0+ps*0];
+		B[1+ps*0] = A[0+ps*1];
+		B[2+ps*0] = A[0+ps*2];
+		B[3+ps*0] = A[0+ps*3];
+
+		A += 1;
+		B += ps;
+		}
+	return;
+	}
+#endif
 

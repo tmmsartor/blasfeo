@@ -3,26 +3,27 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
@@ -217,6 +218,9 @@ inner_kernel_gemv_add_t_4_lib4:
 	.align 8
 1: // main loop
 	
+	prefetcht0	0(%ebx, %ecx, 1) // software prefetch
+	prefetcht0	64(%ebx, %ecx, 1) // software prefetch
+
 	vmovupd	0(%edx), %ymm4
 
 	vmovapd	0(%ebx), %ymm5
@@ -373,16 +377,9 @@ inner_blend_n_scale_ab_4_lib4:
 #if MACRO_LEVEL>=1
 	.macro INNER_BLEND_T_SCALE_AB_4_LIB4
 #else
-	.p2align 4,,15
-#if defined(OS_LINUX)
+	.align 16
 	.type inner_blend_t_scale_ab_4_lib4, @function
 inner_blend_t_scale_ab_4_lib4:
-#elif defined(OS_MAC)
-_inner_blend_t_scale_ab_4_lib4:
-#elif defined(OS_WINDOWS)
-	.def inner_blend_t_scale_ab_4_lib4; .scl 2; .type 32; .endef
-inner_blend_t_scale_ab_4_lib4:
-#endif
 #endif
 
 	// reduction
@@ -407,9 +404,7 @@ inner_blend_t_scale_ab_4_lib4:
 #else
 	ret
 	
-#if defined(OS_LINUX)
 	.size	inner_blend_t_scale_ab_4_lib4, .-inner_blend_t_scale_ab_4_lib4
-#endif
 #endif
 
 

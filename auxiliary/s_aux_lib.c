@@ -3,26 +3,27 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
@@ -33,35 +34,37 @@
 #include "../include/blasfeo_common.h"
 
 #define REAL float
-#define STRMAT blasfeo_smat
-#define STRVEC blasfeo_svec
+#define MAT blasfeo_smat
+#define VEC blasfeo_svec
 
 
 
 #if defined(LA_REFERENCE) | defined(LA_BLAS_WRAPPER)
 
 
-#define SIZE_STRMAT blasfeo_memsize_smat
-#define SIZE_DIAG_STRMAT blasfeo_memsize_diag_smat
-#define SIZE_STRVEC blasfeo_memsize_svec
+#define MEMSIZE_MAT blasfeo_memsize_smat
+#define MEMSIZE_DIAG_MAT blasfeo_memsize_diag_smat
+#define MEMSIZE_VEC blasfeo_memsize_svec
 
-#define CREATE_STRMAT blasfeo_create_smat
-#define CREATE_STRVEC blasfeo_create_svec
+#define CREATE_MAT blasfeo_create_smat
+#define CREATE_VEC blasfeo_create_svec
 
-#define CVT_MAT2STRMAT blasfeo_pack_smat
-#define CVT_TRAN_MAT2STRMAT blasfeo_pack_tran_smat
-#define CVT_VEC2STRVEC blasfeo_pack_svec
-#define CVT_STRMAT2MAT blasfeo_unpack_smat
-#define CVT_TRAN_STRMAT2MAT blasfeo_unpack_tran_smat
-#define CVT_STRVEC2VEC blasfeo_unpack_svec
+#define PACK_MAT blasfeo_pack_smat
+#define PACK_TRAN_MAT blasfeo_pack_tran_smat
+#define PACK_VEC blasfeo_pack_svec
+#define UNPACK_MAT blasfeo_unpack_smat
+#define UNPACK_TRAN_MAT blasfeo_unpack_tran_smat
+#define UNPACK_VEC blasfeo_unpack_svec
 #define CAST_MAT2STRMAT s_cast_mat2strmat
 #define CAST_DIAG_MAT2STRMAT s_cast_diag_mat2strmat
 #define CAST_VEC2VECMAT s_cast_vec2vecmat
 
 
+#define GEAD_LIBSTR blasfeo_sgead
 #define GECP_LIBSTR blasfeo_sgecp
-#define GESC_LIBSTR blasfeo_sgesc
 #define GECPSC_LIBSTR blasfeo_sgecpsc
+#define GESC_LIBSTR blasfeo_sgesc
+#define GESE_LIBSTR blasfeo_sgese
 
 
 
@@ -111,27 +114,6 @@ float blasfeo_svecex1(struct blasfeo_svec *sx, int xi)
 	{
 	float *x = sx->pa + xi;
 	return x[0];
-	}
-
-
-
-// set all elements of a strmat to a value
-void blasfeo_sgese(int m, int n, float alpha, struct blasfeo_smat *sA, int ai, int aj)
-	{
-	// invalidate stored inverse diagonal
-	sA->use_dA = 0;
-
-	int lda = sA->m;
-	float *pA = sA->pA + ai + aj*lda;
-	int ii, jj;
-	for(jj=0; jj<n; jj++)
-		{
-		for(ii=0; ii<m; ii++)
-			{
-			pA[ii+lda*jj] = alpha;
-			}
-		}
-	return;
 	}
 
 
@@ -477,37 +459,6 @@ void blasfeo_strcp_l(int m, struct blasfeo_smat *sA, int ai, int aj, struct blas
 		for(; ii<m; ii++)
 			{
 			pC[ii+0+jj*ldc] = pA[ii+0+jj*lda];
-			}
-		}
-	return;
-	}
-
-
-
-// scale and add a generic strmat into a generic strmat
-void blasfeo_sgead(int m, int n, float alpha, struct blasfeo_smat *sA, int ai, int aj, struct blasfeo_smat *sC, int ci, int cj)
-	{
-	// invalidate stored inverse diagonal
-	sC->use_dA = 0;
-
-	int lda = sA->m;
-	float *pA = sA->pA + ai + aj*lda;
-	int ldc = sC->m;
-	float *pC = sC->pA + ci + cj*ldc;
-	int ii, jj;
-	for(jj=0; jj<n; jj++)
-		{
-		ii = 0;
-		for(; ii<m-3; ii+=4)
-			{
-			pC[ii+0+jj*ldc] += alpha*pA[ii+0+jj*lda];
-			pC[ii+1+jj*ldc] += alpha*pA[ii+1+jj*lda];
-			pC[ii+2+jj*ldc] += alpha*pA[ii+2+jj*lda];
-			pC[ii+3+jj*ldc] += alpha*pA[ii+3+jj*lda];
-			}
-		for(; ii<m; ii++)
-			{
-			pC[ii+0+jj*ldc] += alpha*pA[ii+0+jj*lda];
 			}
 		}
 	return;

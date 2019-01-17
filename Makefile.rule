@@ -3,26 +3,27 @@
 # This file is part of BLASFEO.                                                                   #
 #                                                                                                 #
 # BLASFEO -- BLAS For Embedded Optimization.                                                      #
-# Copyright (C) 2016-2017 by Gianluca Frison.                                                     #
+# Copyright (C) 2016-2018 by Gianluca Frison.                                                     #
 # Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              #
 # All rights reserved.                                                                            #
 #                                                                                                 #
-# HPMPC is free software; you can redistribute it and/or                                          #
-# modify it under the terms of the GNU Lesser General Public                                      #
-# License as published by the Free Software Foundation; either                                    #
-# version 2.1 of the License, or (at your option) any later version.                              #
+# This program is free software: you can redistribute it and/or modify                            #
+# it under the terms of the GNU General Public License as published by                            #
+# the Free Software Foundation, either version 3 of the License, or                               #
+# (at your option) any later version                                                              #.
 #                                                                                                 #
-# HPMPC is distributed in the hope that it will be useful,                                        #
+# This program is distributed in the hope that it will be useful,                                 #
 # but WITHOUT ANY WARRANTY; without even the implied warranty of                                  #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            #
-# See the GNU Lesser General Public License for more details.                                     #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   #
+# GNU General Public License for more details.                                                    #
 #                                                                                                 #
-# You should have received a copy of the GNU Lesser General Public                                #
-# License along with HPMPC; if not, write to the Free Software                                    #
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  #
+# You should have received a copy of the GNU General Public License                               #
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.                          #
 #                                                                                                 #
-# Author: Gianluca Frison, giaf (at) dtu.dk                                                       #
-#                          gianluca.frison (at) imtek.uni-freiburg.de                             #
+# The authors designate this particular file as subject to the "Classpath" exception              #
+# as provided by the authors in the LICENSE file that accompained this code.                      #
+#                                                                                                 #
+# Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             #
 #                                                                                                 #
 ###################################################################################################
 
@@ -45,7 +46,7 @@
 #
 # ARMV8A_ARM_CORTEX_A57
 #
-# GENERIC : generic c99 code
+# GENERIC : generic C code
 
 # Select target architecture
 #
@@ -60,23 +61,55 @@ TARGET = X64_INTEL_HASWELL
 # TARGET = ARMV8A_ARM_CORTEX_A57
 # TARGET = ARMV8A_ARM_CORTEX_A53
 # TARGET = ARMV7A_ARM_CORTEX_A15
+# TARGET = ARMV7A_ARM_CORTEX_A7
 #
 # TARGET = GENERIC
 
-# Select BLASFEO version
+# Select back-end LA version:
+# high_performance: target-tailored; performance-optimized for cache resident matrices; panel-major matrix format
+# reference: target-unspecific lightly-optimized; small code footprint; column-major matrix format
+# BLAS_wrapper: call to external BLAS and LAPACK libraries; column-major matrix format
 #
 LA = HIGH_PERFORMANCE
 # LA = REFERENCE
 # LA = BLAS_WRAPPER
 
-# Select BLAS and LAPACK version (for LA=BLAS_WRAPPER)
+# For LA=BLAS_WRAPPER, select external BLAS and LAPACK implementation
 #
 REF_BLAS = 0
+# REF_BLAS = SYSTEM
 # REF_BLAS = OPENBLAS
 # REF_BLAS = NETLIB
 # REF_BLAS = MKL
 # REF_BLAS = BLIS
 # REF_BLAS = ATLAS
+
+# Macro level (code size vs performance in assembly kernels):
+# 0 (no macro), 1 (all macro but gemm kernel), 2 (all macro)
+#
+MACRO_LEVEL = 0
+
+# Compile BLAS API routines (experimental)
+BLAS_API = 0
+# BLAS_API = 1
+
+# Compile CBLAS API routines (experimental)
+CBLAS_API = 0
+# CBLAS_API = 1
+
+# Export standard FORTRAN API for BLAS API routines (experimental)
+FORTRAN_BLAS_API = 0
+# FORTRAN_BLAS_API = 1
+
+ifeq ($(CBLAS_API), 1) 
+ifeq ($(FORTRAN_BLAS_API), 0)
+$(error Cannot expose non-FORTRAN style BLAS API when building CBLAS API. Exiting.)	
+endif
+endif
+
+
+# Maximum K value for stack buffer size (decrease this value if stack size is exceeded)
+K_MAX_STACK = 300
 
 # Use C99 extension to math library
 #
@@ -97,9 +130,12 @@ TESTING_MODE = 0
 BENCHMARKS_MODE = 0
 # BENCHMARKS_MODE = 1
 
+SANDBOX_MODE = 0
+# SANDBOX_MODE = 1
+
 # Enable on-line checks for matrix and vector dimensions
 #
- RUNTIME_CHECKS = 0
+RUNTIME_CHECKS = 0
 # RUNTIME_CHECKS = 1
 
 # Operating system (automatic selection)
@@ -120,26 +156,16 @@ endif
 # C Compiler
 #
 CC = gcc
-AR = ar
 # CC = clang
 # CC = x86_64-w64-mingw32-gcc
+AR = ar
 
 # Installation directory
 PREFIX = /opt
 
-# Macro level (code size vs performance in assembly kernels):
-# 0 (no macro), 1 (all macro but gemm kernel), 2 (all macro)
-#
-MACRO_LEVEL = 0
-
-# Minimum size of the computation kernel in level 3 routines
-#
-MIN_KERNEL_SIZE = 2x2
-#MIN_KERNEL_SIZE = 4x4
-
 # compiler / assembler / linker flags
 #
-CFLAGS  =
+# CFLAGS  =
 ASFLAGS =
 LDFLAGS =
 
@@ -163,30 +189,51 @@ current_dir := $(patsubst %/,%,$(dir $(mkfile_path)))
 
 ifeq ($(LA), HIGH_PERFORMANCE)
 CFLAGS  += -DLA_HIGH_PERFORMANCE
+BINARY_DIR = build/$(LA)/$(TARGET)
 endif
 ifeq ($(LA), REFERENCE)
 CFLAGS  += -DLA_REFERENCE
+BINARY_DIR = build/$(LA)/$(TARGET)
 endif
 ifeq ($(LA), BLAS_WRAPPER)
 CFLAGS  += -DLA_BLAS_WRAPPER
+BINARY_DIR = build/$(LA)/$(REF_BLAS)
+endif
+CFLAGS  += -DLA=$(LA)
+
+ifeq ($(BLAS_API), 1)
+CFLAGS += -DBLAS_API
+ASFLAGS += -DBLAS_API
+endif
+ifeq ($(FORTRAN_BLAS_API), 1)
+CFLAGS += -DBLAS_API -DFORTRAN_BLAS_API
+ASFLAGS += -DBLAS_API
 endif
 
-CFLAGS  += -DLA=$(LA)
+CFLAGS  += -DK_MAX_STACK=$(K_MAX_STACK)
 
 ifeq ($(USE_C99_MATH), 1)
 CFLAGS += -DUSE_C99_MATH
 endif
+
 ifeq ($(RUNTIME_CHECKS), 1)
 CFLAGS += -DDIM_CHECK
 endif
+
 ifeq ($(EXT_DEP), 1)
 CFLAGS += -DEXT_DEP
 endif
+
 ifeq ($(TESTING_MODE), 1)
 CFLAGS += -DTESTING_MODE
 endif
+
 ifeq ($(BENCHMARKS_MODE), 1)
 CFLAGS += -DBENCHMARKS_MODE
+endif
+
+ifeq ($(SANDBOX_MODE), 1)
+CFLAGS += -DSANDBOX_MODE
 endif
 
 ifeq ($(MACRO_LEVEL), 1)
@@ -194,14 +241,6 @@ ASFLAGS += -DMACRO_LEVEL=1
 endif
 ifeq ($(MACRO_LEVEL), 2)
 ASFLAGS += -DMACRO_LEVEL=2
-endif
-
-ifeq ($(MIN_KERNEL_SIZE), 2x2)
-CFLAGS += -DMIN_KERNEL_SIZE=2
-ASFLAGS += -DMIN_KERNEL_SIZE=2
-else
-CFLAGS += -DMIN_KERNEL_SIZE=4
-ASFLAGS += -DMIN_KERNEL_SIZE=4
 endif
 
 ifeq ($(OS), LINUX)
@@ -216,6 +255,14 @@ ifeq ($(OS), WINDOWS)
 CFLAGS  += -DOS_WINDOWS
 ASFLAGS += -DOS_WINDOWS
 endif
+ifeq ($(SOC), DSPACE)
+CFLAGS  += -D__DSPACE__
+ASFLAGS += -D__DSPACE__
+endif
+ifeq ($(SOC), BACHMANN)
+CFLAGS  += -D__BACHMANN__
+ASFLAGS += -D__BACHMANN__
+endif
 
 # REF_BLAS
 
@@ -226,11 +273,14 @@ endif
 ifeq ($(REF_BLAS), 0)
 CFLAGS  +=
 endif
+ifeq ($(REF_BLAS), SYSTEM)
+CFLAGS  += -DREF_BLAS_SYSTEM
+endif
 ifeq ($(REF_BLAS), OPENBLAS)
 CFLAGS  += -DREF_BLAS_OPENBLAS -I/opt/openblas/include
 endif
 ifeq ($(REF_BLAS), BLIS)
-CFLAGS  += -DREF_BLAS_BLIS -std=c99
+CFLAGS  += -DREF_BLAS_BLIS -I/opt/blis/include/blis -std=gnu99
 endif
 ifeq ($(REF_BLAS), NETLIB)
 CFLAGS  += -DREF_BLAS_NETLIB
@@ -276,6 +326,10 @@ endif
 ifeq ($(TARGET), ARMV7A_ARM_CORTEX_A15)
 CFLAGS  += -marm -mfloat-abi=hard -mfpu=neon-vfpv4 -mcpu=cortex-a15 -DTARGET_ARMV7A_ARM_CORTEX_A15
 ASFLAGS += -mfpu=neon-vfpv4 -DTARGET_ARMV7A_ARM_CORTEX_A15
+endif
+ifeq ($(TARGET), ARMV7A_ARM_CORTEX_A7)
+CFLAGS  += -marm -mfloat-abi=hard -mfpu=neon-vfpv4 -mcpu=cortex-a7 -DTARGET_ARMV7A_ARM_CORTEX_A7
+ASFLAGS += -mfpu=neon-vfpv4 -DTARGET_ARMV7A_ARM_CORTEX_A7
 endif
 ifeq ($(TARGET), GENERIC)
 CFLAGS  += -DTARGET_GENERIC

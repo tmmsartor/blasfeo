@@ -3,26 +3,27 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
@@ -41,13 +42,14 @@
 
 #define PRINT_MAT s_print_mat
 #define PRINT_TO_FILE_MAT s_print_to_file_mat
+#define PRINT_TO_FILE_EXP_MAT s_print_to_file_exp_mat
 #define PRINT_TO_STRING_MAT s_print_to_string_mat
 
 #define PRINT_TRAN_MAT s_print_tran_mat
 #define PRINT_TO_FILE_TRAN_MAT s_print_to_file_tran_mat
 
-#define PRINT_E_MAT s_print_e_mat
-#define PRINT_E_TRAN_MAT s_print_e_tran_mat
+#define PRINT_EXP_MAT s_print_exp_mat
+#define PRINT_EXP_TRAN_MAT s_print_exp_tran_mat
 
 
 
@@ -67,15 +69,16 @@
 #define PRINT_TRAN_STRVEC blasfeo_print_tran_svec_ref
 
 #define PRINT_TO_FILE_STRMAT blasfeo_print_to_file_smat_ref
+#define PRINT_TO_FILE_EXP_STRMAT blasfeo_print_to_file_exp_smat_ref
 #define PRINT_TO_FILE_STRVEC blasfeo_print_to_file_svec_ref
 #define PRINT_TO_FILE_TRAN_STRVEC blasfeo_s_print_to_file_tran_strvec_ref
 #define PRINT_TO_STRING_STRMAT blasfeo_print_to_string_smat_ref
 #define PRINT_TO_STRING_STRVEC blasfeo_print_to_string_svec_ref
 #define PRINT_TO_STRING_TRAN_STRVEC blasfeo_print_to_string_tran_svec_ref
 
-#define PRINT_E_STRMAT blasfeo_print_exp_smat_ref
-#define PRINT_E_STRVEC blasfeo_print_exp_svec_ref
-#define PRINT_E_TRAN_STRVEC blasfeo_print_exp_tran_svec_ref
+#define PRINT_EXP_STRMAT blasfeo_print_exp_smat_ref
+#define PRINT_EXP_STRVEC blasfeo_print_exp_svec_ref
+#define PRINT_EXP_TRAN_STRVEC blasfeo_print_exp_tran_svec_ref
 
 #include "x_aux_ext_dep_lib0.c"
 

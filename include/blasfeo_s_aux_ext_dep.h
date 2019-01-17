@@ -3,26 +3,27 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
@@ -30,19 +31,18 @@
 #define BLASFEO_S_AUX_EXT_DEP_H_
 
 
-#if defined(EXT_DEP)
-
-
-
-#include <stdio.h>
 
 #include "blasfeo_common.h"
+
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
+
+#ifdef EXT_DEP
 
 /************************************************
 * s_aux_extern_depend_lib.c
@@ -66,14 +66,18 @@ void s_print_mat(int m, int n, float *A, int lda);
 void s_print_tran_mat(int row, int col, float *A, int lda);
 // print to file a column-major matrix
 void s_print_to_file_mat(FILE *file, int row, int col, float *A, int lda);
+// print to file a column-major matrix in exponential format
+void s_print_to_file_exp_mat(FILE *file, int row, int col, float *A, int lda);
 // print to string a column-major matrix
 int s_print_to_string_mat(char **buf_out, int row, int col, float *A, int lda);
 // print to file the transposed of a column-major matrix
 void s_print_tran_to_file_mat(FILE *file, int row, int col, float *A, int lda);
+// print to file the transposed of a column-major matrix in exponential format
+void s_print_tran_to_file_exp_mat(FILE *file, int row, int col, float *A, int lda);
 // print in exponential notation a column-major matrix
-void s_print_e_mat(int m, int n, float *A, int lda);
+void s_print_exp_mat(int m, int n, float *A, int lda);
 // print in exponential notation the transposed of a column-major matrix
-void s_print_e_tran_mat(int row, int col, float *A, int lda);
+void s_print_exp_tran_mat(int row, int col, float *A, int lda);
 
 /* strmat and strvec */
 
@@ -91,6 +95,8 @@ void blasfeo_print_smat(int m, int n, struct blasfeo_smat *sA, int ai, int aj);
 void blasfeo_print_exp_smat(int m, int n, struct blasfeo_smat *sA, int ai, int aj);
 // print to file a strmat
 void blasfeo_print_to_file_smat(FILE *file, int m, int n, struct blasfeo_smat *sA, int ai, int aj);
+// print to file a strmat in exponential format
+void blasfeo_print_to_file_exp_smat(FILE *file, int m, int n, struct blasfeo_smat *sA, int ai, int aj);
 // print to string a strmat
 void blasfeo_print_to_string_smat(char **buf_out, int m, int n, struct blasfeo_smat *sA, int ai, int aj);
 // print a strvec
@@ -110,6 +116,8 @@ void blasfeo_print_to_file_tran_svec(FILE *file, int m, struct blasfeo_svec *sa,
 // print to string the transposed of a strvec
 void blasfeo_print_to_string_tran_svec(char **buf_out, int m, struct blasfeo_svec *sa, int ai);
 
+#endif // EXT_DEP
+
 
 
 #ifdef __cplusplus
@@ -117,7 +125,5 @@ void blasfeo_print_to_string_tran_svec(char **buf_out, int m, struct blasfeo_sve
 #endif
 
 
-
-#endif  // EXT_DEP
 
 #endif  // BLASFEO_S_AUX_EXT_DEP_H_

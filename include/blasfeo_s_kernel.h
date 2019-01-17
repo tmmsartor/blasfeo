@@ -3,26 +3,27 @@
 * This file is part of BLASFEO.                                                                   *
 *                                                                                                 *
 * BLASFEO -- BLAS For Embedded Optimization.                                                      *
-* Copyright (C) 2016-2017 by Gianluca Frison.                                                     *
+* Copyright (C) 2016-2018 by Gianluca Frison.                                                     *
 * Developed at IMTEK (University of Freiburg) under the supervision of Moritz Diehl.              *
 * All rights reserved.                                                                            *
 *                                                                                                 *
-* HPMPC is free software; you can redistribute it and/or                                          *
-* modify it under the terms of the GNU Lesser General Public                                      *
-* License as published by the Free Software Foundation; either                                    *
-* version 2.1 of the License, or (at your option) any later version.                              *
+* This program is free software: you can redistribute it and/or modify                            *
+* it under the terms of the GNU General Public License as published by                            *
+* the Free Software Foundation, either version 3 of the License, or                               *
+* (at your option) any later version                                                              *.
 *                                                                                                 *
-* HPMPC is distributed in the hope that it will be useful,                                        *
+* This program is distributed in the hope that it will be useful,                                 *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                                  *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                                            *
-* See the GNU Lesser General Public License for more details.                                     *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                   *
+* GNU General Public License for more details.                                                    *
 *                                                                                                 *
-* You should have received a copy of the GNU Lesser General Public                                *
-* License along with HPMPC; if not, write to the Free Software                                    *
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA                  *
+* You should have received a copy of the GNU General Public License                               *
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.                          *
 *                                                                                                 *
-* Author: Gianluca Frison, giaf (at) dtu.dk                                                       *
-*                          gianluca.frison (at) imtek.uni-freiburg.de                             *
+* The authors designate this particular file as subject to the "Classpath" exception              *
+* as provided by the authors in the LICENSE file that accompained this code.                      *
+*                                                                                                 *
+* Author: Gianluca Frison, gianluca.frison (at) imtek.uni-freiburg.de                             *
 *                                                                                                 *
 **************************************************************************************************/
 
@@ -30,9 +31,12 @@
 #define BLASFEO_S_KERNEL_H_
 
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
 
 //
 // lib8
@@ -129,6 +133,8 @@ void kernel_ssyrk_spotrf_nt_l_8x4_lib8(int kp, float *Ap, float *Bp, int km_, fl
 void kernel_strmm_nn_rl_8x4_lib8(int k, float *alpha, float *A, int offsetB, float *B, int sdb, float *D);
 void kernel_strmm_nn_rl_8x4_vs_lib8(int k, float *alpha, float *A, int offsetB, float *B, int sdb, float *D, int km, int kn);
 void kernel_strmm_nn_rl_8x4_gen_lib8(int k, float *alpha, float *A, int offsetB, float *B, int sdb, int offsetD, float *D, int sdd, int m0, int m1, int n0, int n1);
+void kernel_strmm_nt_ru_8x4_lib8(int k, float *alpha, float *A, float *B, float *D);
+void kernel_strmm_nt_ru_8x4_vs_lib8(int k, float *alpha, float *A, float *B, float *D, int km, int kn);
 
 // 4x8
 void kernel_sgemm_nt_4x8_lib8(int k, float *alpha, float *A, float *B, float *beta, float *C, float *D);
@@ -321,18 +327,19 @@ void kernel_strsm_nt_rl_inv_12x4_lib4(int k, float *A, int sda, float *B, float 
 void kernel_sgemm_nt_8x8_lib4(int k, float *alpha, float *A, int sda, float *B, int sdb, float *beta, float *C, int sdc, float *D, int sdd); //
 // 8x4
 void kernel_sgemm_nt_8x4_lib4(int k, float *alpha, float *A, int sda, float *B, float *beta, float *C, int sdc, float *D, int sdd); //
+void kernel_sgemm_nn_8x4_lib4(int k, float *alpha, float *A, int sda, int offsetB, float *B, int sdb, float *beta, float *C, int sdc, float *D, int sdd); //
 void kernel_spotrf_nt_l_8x4_lib4(int k, float *A, int sda, float *B, float *C, int sdc, float *D, int sdd, float *inv_diag_D);
 void kernel_strsm_nt_rl_inv_8x4_lib4(int k, float *A, int sda, float *B, float *C, int sdc, float *D, int sdd, float *E, float *inv_diag_E);
 // 4x4
 void kernel_sgemm_nt_4x4_lib4(int k, float *alpha, float *A, float *B, float *beta, float *C, float *D); //
 void kernel_sgemm_nt_4x4_vs_lib4(int k, float *alpha, float *A, float *B, float *beta, float *C, float *D, int km, int kn); //
 void kernel_sgemm_nt_4x4_gen_lib4(int k, float *alpha, float *A, float *B, float *beta, int offsetC, float *C, int sdc, int offsetD, float *D, int sdd, int m0, int m1, int k0, int k1);
-void kernel_sgemm_nn_4x4_lib4(int k, float *alpha, float *A, float *B, int sdb, float *beta, float *C, float *D); //
-void kernel_sgemm_nn_4x4_vs_lib4(int k, float *alpha, float *A, float *B, int sdb, float *beta, float *C, float *D, int km, int kn); //
+void kernel_sgemm_nn_4x4_lib4(int k, float *alpha, float *A, int offsetB, float *B, int sdb, float *beta, float *C, float *D); //
+void kernel_sgemm_nn_4x4_vs_lib4(int k, float *alpha, float *A, int offsetB, float *B, int sdb, float *beta, float *C, float *D, int km, int kn); //
 void kernel_ssyrk_nt_l_4x4_lib4(int k, float *alpha, float *A, float *B, float *beta, float *C, float *D); //
 void kernel_ssyrk_nt_l_4x4_vs_lib4(int k, float *alpha, float *A, float *B, float *beta, float *C, float *D, int km, int kn); //
-void kernel_strmm_nt_ru_4x4_lib4(int k, float *alpha, float *A, float *B, float *beta, float *C, float *D); //
-void kernel_strmm_nt_ru_4x4_vs_lib4(int k, float *alpha, float *A, float *B, float *beta, float *C, float *D, int km, int kn); //
+void kernel_strmm_nt_ru_4x4_lib4(int k, float *alpha, float *A, float *B, float *D); //
+void kernel_strmm_nt_ru_4x4_vs_lib4(int k, float *alpha, float *A, float *B, float *D, int km, int kn); //
 void kernel_strmm_nn_rl_4x4_lib4(int k, float *alpha, float *A, int offsetB, float *B, int sdb, float *D);
 void kernel_strmm_nn_rl_4x4_gen_lib4(int k, float *alpha, float *A, int offsetB, float *B, int sdb, int offsetD, float *D, int sdd, int m0, int m1, int n0, int n1);
 void kernel_strsm_nt_rl_inv_4x4_lib4(int k, float *A, float *B, float *C, float *D, float *E, float *inv_diag_E);
@@ -409,6 +416,18 @@ void kernel_sgetr_4_lib4(int tri, int kmax, int kna, float alpha, float *A, floa
 void kernel_sgetr_3_lib4(int tri, int kmax, int kna, float alpha, float *A, float *C, int sdc);
 void kernel_sgetr_2_lib4(int tri, int kmax, int kna, float alpha, float *A, float *C, int sdc);
 void kernel_sgetr_1_lib4(int tri, int kmax, int kna, float alpha, float *A, float *C, int sdc);
+
+
+
+/************************************************
+* BLAS API kernels
+************************************************/
+
+#ifdef BLAS_API
+
+// TODO
+
+#endif // BLAS_API
 
 
 
